@@ -6,8 +6,7 @@ public class TransactionValidator {
 
     public static String validateAccountNumber(String rawAccountNumber) {
         String accountNumber = rawAccountNumber.trim();
-        boolean isValidAccountNumber = accountNumber.matches("\\d{12}");
-        if (isValidAccountNumber) {
+        if (accountNumber.matches("\\d{12}")) {
             return accountNumber;
         }
         throw new IllegalArgumentException("[ERROR] 사용자의 계좌번호가 형식에 맞지 않습니다.");

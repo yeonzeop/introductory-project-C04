@@ -5,17 +5,29 @@ import BanKU.enums.Menu;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
+import java.util.List;
 import java.util.Scanner;
 
 import static BanKU.utils.DateValidator.validateDate;
 import static BanKU.utils.MemberValidator.*;
+import static BanKU.utils.TransactionValidator.validateAccountNumber;
 
 
 public class InputView {
 
-    public static Menu getMenu() {
-        Scanner scanner = new Scanner(System.in);
+    public static Menu getMenu(Scanner scanner) {
         while (true) {
+            System.out.print("       -----------------------------------------------------------------------\n" +
+                             "                                        메 뉴                                  \n" +
+                             "       -----------------------------------------------------------------------\n" +
+                             "       1. 입금\n" +
+                             "       2. 출금\n" +
+                             "       3. 송금\n" +
+                             "       4. 계좌 조회\n" +
+                             "       5. 계좌 생성\n" +
+                             "       6. 종료\n" +
+                             "       ------------------------------------------------------------------------\n" +
+                             "       메뉴를 입력해주세요(1~6 사이의 숫자) > ");
             String input = scanner.nextLine();
             try {
                 return Menu.of(input);
@@ -26,8 +38,21 @@ public class InputView {
         }
     }
 
-    public static Account chooseAccount() {
-        return null;
+    public static Account chooseAccount(List<Account> accounts, Scanner scanner) {
+        while (true) {
+            try {
+                System.out.print("BanKU: 거래를 원하는 계좌번호를 입력해주세요(-없이 숫자로만 입력해주세요) > ");
+                String accountNumber = validateAccountNumber(scanner.nextLine());
+                for (Account account : accounts) {
+                    if (account.getAccountNumber().equals(accountNumber)) {
+                        return account;
+                    }
+                }
+                throw new IllegalArgumentException("[ERROR] 존재하지 않는 계좌번호입니다.");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public static MonthDay requestNowDate(Scanner scanner) {
@@ -113,5 +138,10 @@ public class InputView {
                 System.out.println(e.getMessage());
             }
         }
+    }
+
+    public static String requestAccountPassword() {
+        // TODO: 계좌 새로 생성 시 비밀번호 요청 프롬프트 (4자리 숫자)
+        return "1234";
     }
 }

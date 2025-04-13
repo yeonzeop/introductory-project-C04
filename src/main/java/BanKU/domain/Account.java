@@ -49,4 +49,8 @@ public class Account {
                 ", isActive=" + isActive +
                 '}';
     }
+
+    public long getBalance() {
+        return balance;
+    }
 }

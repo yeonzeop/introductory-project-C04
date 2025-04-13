@@ -9,6 +9,8 @@ import BanKU.view.OutputView;
 
 import java.time.MonthDay;
 import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
 
 public class AccountService {
     private MonthDay now;
@@ -22,10 +24,10 @@ public class AccountService {
         transactionRepository.saveDeposit();
     }
 
-    public Account choose(Member member) {
+    public Account choose(Member member, Scanner scanner) {
         List<Account> accounts = member.getAccounts();
-        OutputView.showAccounts(accounts);
-        return InputView.chooseAccount();
+        OutputView.showAccounts(member.getName(), accounts);
+        return InputView.chooseAccount(accounts, scanner);
     }
 
     public void withdrawal(Account account) {
@@ -40,4 +42,5 @@ public class AccountService {
     public void setNow(MonthDay now) {
         this.now = now;
     }
+
 }

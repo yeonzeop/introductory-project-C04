@@ -82,9 +82,10 @@ public class Member {
                 ", accounts=" + accounts +
                 '}';
     }
-// 아이디 입력
-    // 로그인 비밀번호 입력
-    // 이름 입력
-    // 생년월일 입력
 
+    public void addAccount(Account account) {
+        if (accounts.size() <= 2) {
+            accounts.add(account);
+        }
+    }
 }

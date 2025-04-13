@@ -64,20 +64,21 @@ public class MemberRepository {
     }
 
     public void saveMember(Member member) {
-
+        // TODO. 파일에 회원정보 저장 (추가하기)
     }
 
-    public void saveAccount(Account account) {
-
+    public void saveAccount(Member member, Account account) {
+        // TODO. 파일에서 member에 해당하는 행 찾아서 account 추가하기
     }
 
-    public void isPresentAccount(String accountNumber) {
-        if (!accounts.containsKey(accountNumber)) {
-            throw new IllegalArgumentException("[ERROR] 존재하지 않는 계좌입니다.");
-        }
-        if (!accounts.get(accountNumber).isActive()) {
-            throw new IllegalArgumentException("[ERROR] 비활성화 된 계좌입니다.");
-        }
+    public boolean isPresentAccount(String accountNumber) {
+        return accounts.containsKey(accountNumber);
+//        if (!accounts.containsKey(accountNumber)) {
+//            throw new IllegalArgumentException("[ERROR] 존재하지 않는 계좌입니다.");
+//        }
+//        if (!accounts.get(accountNumber).isActive()) {
+//            throw new IllegalArgumentException("[ERROR] 비활성화 된 계좌입니다.");
+//        }
     }
 
     public Account findAccountByNumber(String accountNumber) {

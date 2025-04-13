@@ -5,6 +5,7 @@ import BanKU.domain.Member;
 import BanKU.repository.MemberRepository;
 import BanKU.view.InputView;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.Scanner;
 
@@ -85,7 +86,30 @@ public class MemberService {
     }
 
     public void createAccount(Member member) {
-        Account account = new Account("", "");
-        memberRepository.saveAccount(account);
+        if (member.getAccounts().size() >= 3) {
+            System.out.println("[ERROR] 계좌가 3개 이상입니다. 추가 계좌를 생성할 수 없습니다.");
+            return;
+        }
+        String accountNumber = generateUniqueAccountNumber();
+        String password = InputView.requestAccountPassword();
+
+        Account account = new Account(accountNumber, password);
+        member.addAccount(account);
+        memberRepository.saveAccount(member, account);
+    }
+
+    private String generateUniqueAccountNumber() {
+        SecureRandom random = new SecureRandom();
+        while (true) {
+            StringBuilder sb = new StringBuilder();
+            while (sb.length() < 8) {
+                sb.append(random.nextInt(10));      // 0~9 중 하나 추가
+            }
+            String accountNumber = "1123" + sb.toString();
+            if (memberRepository.isPresentAccount(accountNumber)) {
+                continue;
+            }
+            return accountNumber;
+        }
     }
 }
