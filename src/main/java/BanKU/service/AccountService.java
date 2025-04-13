@@ -5,8 +5,8 @@ import BanKU.domain.Account;
 import BanKU.domain.Member;
 import BanKU.repository.TransactionRepository;
 import BanKU.view.InputView;
+import BanKU.view.OutputView;
 
-import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class AccountService {
 
     public Account choose(Member member) {
         List<Account> accounts = member.getAccounts();
-        InputView.showAccounts(accounts);
+        OutputView.showAccounts(accounts);
         return InputView.chooseAccount();
     }
 

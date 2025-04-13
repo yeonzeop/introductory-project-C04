@@ -11,8 +11,10 @@ import BanKU.service.AccountService;
 import BanKU.service.DateService;
 import BanKU.service.MemberService;
 import BanKU.view.InputView;
+import BanKU.view.OutputView;
 
 import java.time.MonthDay;
+import java.util.Scanner;
 
 public class BanKUController {
 
@@ -27,12 +29,13 @@ public class BanKUController {
     }
 
     public void run() {
+        Scanner scanner = new Scanner(System.in);
         // 1. 날짜 입력받기
-        MonthDay nowDate = dateService.getNowDate();
+        MonthDay nowDate = dateService.getNowDate(scanner);
         accountService.setNow(nowDate);
 
         // 2. 로그인/회원가입 기능
-        Member member = memberService.handleLoginOrSignup();
+        Member member = memberService.handleLoginOrSignup(scanner);
 
         // 3. 계좌 선택 (신규 회원인 경우 계좌 생성으로 바로 넘어가기)
         Account account = accountService.choose(member);
@@ -44,7 +47,7 @@ public class BanKUController {
                 case DEPOSIT -> accountService.deposit(account);
                 case WITHDRAWAL -> accountService.withdrawal(account);
                 case TRANSFER -> accountService.transfer(account);
-                case ACCOUNT_INQUIRY -> InputView.showAccounts(member.getAccounts());
+                case ACCOUNT_INQUIRY -> OutputView.showAccounts(member.getAccounts());
                 case ACCOUNT_CREATION -> memberService.createAccount(member);
                 case QUIT -> {
                     return;

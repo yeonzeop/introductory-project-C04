@@ -17,12 +17,13 @@ public class MemberValidator {
      */
     public static String validateLoginId(String rawLoginId) {
         String loginId = rawLoginId.trim().toUpperCase();
-        boolean hasKorean = loginId.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣].*");
-        boolean hasSpecial = loginId.matches(".*[^a-zA-Z0-9].*");
-        if (2 <= loginId.length() && loginId.length() <= 10 && !hasKorean && !hasSpecial) {
-            return loginId;
+        if (!loginId.matches("^[a-zA-Z0-9]+$")) {
+            throw new IllegalArgumentException("[ERROR] 아이디는 2자 이상 10자 이하의 숫자 또는 영문자로만 입력해주세요.");
         }
-        throw new IllegalArgumentException("[ERROR] 사용자의 로그인 아이디 값이 형식에 맞지 않습니다.");
+        if (loginId.length() < 2 || loginId.length() > 10) {
+            throw new IllegalArgumentException("[ERROR] 10자 이내의 아이디를 입력해주세요");
+        }
+        return loginId;
     }
 
     /**
@@ -32,11 +33,14 @@ public class MemberValidator {
      */
     public static String validatePassword(String rawPassword) {
         String password = rawPassword.trim();
-        boolean isSixDigitNumber = password.matches("\\d{6}");
-        if (isSixDigitNumber) {
-            return password;
+        if (password.length() != 6) {
+            throw new IllegalArgumentException("[ERROR] 숫자 6자리로만 구성된 비밀번호를 입력해주세요");
         }
-        throw new IllegalArgumentException("[ERROR] 사용자의 로그인 비밀번호가 형식에 맞지 않습니다.");
+        if (!password.matches("\\d{6}")) {
+            throw new IllegalArgumentException("[ERROR] 숫자 6자리로만 구성된 비밀번호를 입력해주세요.");
+        }
+
+        return password;
     }
 
 
@@ -47,11 +51,21 @@ public class MemberValidator {
      */
     public static String validateName(String rawName) {
         String name = rawName.trim();
-        boolean isValidName = name.matches("^[가-힣]{2,4}$");
-        if (isValidName) {
-            return name;
+        if (!name.matches(".*[가-힣].*")) {
+            // 한글이 하나도 없음
+            throw new IllegalArgumentException("[ERROR] BanKU는 한글 이름만을 지원합니다.");
         }
-        throw new IllegalArgumentException("[ERROR] 사용자의 이름이 형식에 맞지 않습니다.");
+
+        if (!name.matches("^[가-힣]+$")) {
+            // 한글은 포함되어 있지만, 다른 문자와 혼합됨
+            throw new IllegalArgumentException("[ERROR] 한글 문자를 입력해주세요.");
+        }
+
+        if (!name.matches("^[가-힣]{2,4}$")) {
+            // 글자 수가 2~4자가 아님
+            throw new IllegalArgumentException("[ERROR] 한글 이름은 2자 이상 4자 이하로 입력해주세요.");
+        }
+        return name;
     }
 
     /**
@@ -61,9 +75,11 @@ public class MemberValidator {
      */
     public static LocalDate validateBirthday(String rawBirthday) {
         String birthday = rawBirthday.trim();
-        boolean isSixDigitNumber = birthday.matches("\\d{6}");
-        if (!isSixDigitNumber) {
-            throw new IllegalArgumentException("[ERROR] 사용자의 생일이 숫자로만 이루어져 있지 않습니다.");
+        if (!birthday.matches("\\d+")) {
+            throw new IllegalArgumentException("[ERROR] 숫자만을 입력해주세요");
+        }
+        if (birthday.length() != 6) {
+            throw new IllegalArgumentException("[ERROR] 숫자 6자리로 구성된 생년월일을 입력해주세요");
         }
         String fullBirthday = validateMemberAge(birthday);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -122,14 +138,14 @@ public class MemberValidator {
      */
     private static Account validateAccount(String accountInfo) {
         String[] strings = accountInfo.split("&");
-        if (strings.length != 2 ){
+        if (strings.length != 2) {
             throw new IllegalArgumentException();
         }
         String accountNumber = strings[0];
         String password = strings[1];
         boolean isValidAccountNumber = accountNumber.matches("\\d{12}");
         boolean isValidPassword = password.matches("\\d{4}");
-        if (isValidAccountNumber && isValidPassword){
+        if (isValidAccountNumber && isValidPassword) {
             return new Account(accountNumber, password);
         }
         throw new IllegalArgumentException("[ERROR] 사용자의 계좌번호 데이터가 형식에 맞지 않습니다.");

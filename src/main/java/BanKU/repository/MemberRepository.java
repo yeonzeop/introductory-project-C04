@@ -87,4 +87,15 @@ public class MemberRepository {
         }
         return account;
     }
+
+    public Member findMemberByLoginId(String loginId) {
+        if (membersByLoginId.containsKey(loginId)){
+            return membersByLoginId.get(loginId);
+        }
+        throw new IllegalArgumentException("[ERROR] 등록되지 않은 아이디입니다.");
+    }
+
+    public boolean isExistingLoginId(String loginId) {
+        return membersByLoginId.containsKey(loginId);
+    }
 }

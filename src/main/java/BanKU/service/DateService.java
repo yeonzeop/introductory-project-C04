@@ -13,8 +13,7 @@ public class DateService {
         this.dateRepository = dateRepository;
     }
 
-    public MonthDay getNowDate() {
-        Scanner scanner = new Scanner(System.in);
+    public MonthDay getNowDate(Scanner scanner) {
         while (true) {
             try {
                 MonthDay nowDate = InputView.requestNowDate(scanner);
