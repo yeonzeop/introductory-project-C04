@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.MonthDay;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -59,10 +60,19 @@ public class DateRepository {
         if (!lastDate.isBefore(nowDate)){
             throw new IllegalArgumentException("[ERROR] "+lastDate +"보다 이후의 날짜여야 합니다. \n 현재 날짜를 다시 입력해주세요.");
         }
+        dates.add(nowDate);
         return nowDate;
     }
 
-    public void save(MonthDay now) {
+    public void save(MonthDay now) throws IOException {
         // TODO. 날짜 파일에 오늘 날짜 저장
+        Path path = Paths.get(DATE_FILE_PATH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+        List<String> rawDates = new ArrayList<>();
+        for(MonthDay date:dates){
+            String str = date.format(formatter);
+            rawDates.add(str);
+        }
+        Files.write(path,rawDates);
     }
 }

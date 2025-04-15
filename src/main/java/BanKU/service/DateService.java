@@ -3,6 +3,7 @@ package BanKU.service;
 import BanKU.repository.DateRepository;
 import BanKU.view.InputView;
 
+import java.io.IOException;
 import java.time.MonthDay;
 import java.util.Scanner;
 
@@ -19,7 +20,8 @@ public class DateService {
                 MonthDay nowDate = InputView.requestNowDate(scanner);
                 MonthDay now = dateRepository.isAfterLastDate(nowDate);
                 dateRepository.save(now);
-            } catch (IllegalArgumentException e) {
+                return now;
+            } catch (IllegalArgumentException | IOException e) {
                 System.out.println(e.getMessage());
             }
         }
