@@ -2,9 +2,11 @@ package BanKU;
 
 
 import BanKU.controller.BanKUController;
+import BanKU.domain.Account;
 import BanKU.repository.DateRepository;
 import BanKU.repository.MemberRepository;
 import BanKU.repository.TransactionRepository;
+import BanKU.view.InputView;
 
 public class Main {
 
@@ -18,7 +20,10 @@ public class Main {
         MemberRepository memberRepository = new MemberRepository();     // user.txt 파일 읽어오기
         TransactionRepository transactionRepository = new TransactionRepository(memberRepository);      // transaction.txt 파일 읽어오기
 
-        // 3. 메인 기능
+//        transactionRepository.printTransactions();
+//        memberRepository.printAccounts();
+
+        // 2. 메인 기능
         BanKUController banKUController = new BanKUController(dateRepository, memberRepository, transactionRepository);
         banKUController.run();
     }

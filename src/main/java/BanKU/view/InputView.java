@@ -15,29 +15,6 @@ import static BanKU.utils.TransactionValidator.validateAccountNumber;
 
 public class InputView {
 
-    public static Menu getMenu(Scanner scanner) {
-        while (true) {
-            System.out.print("       -----------------------------------------------------------------------\n" +
-                             "                                        메 뉴                                  \n" +
-                             "       -----------------------------------------------------------------------\n" +
-                             "       1. 입금\n" +
-                             "       2. 출금\n" +
-                             "       3. 송금\n" +
-                             "       4. 계좌 조회\n" +
-                             "       5. 계좌 생성\n" +
-                             "       6. 종료\n" +
-                             "       ------------------------------------------------------------------------\n" +
-                             "       메뉴를 입력해주세요(1~6 사이의 숫자) > ");
-            String input = scanner.nextLine();
-            try {
-                return Menu.of(input);
-            } catch (IllegalArgumentException e) {
-                // 사용자가 메뉴 번호를 잘못 입력했을 경우 메시지 출력
-                System.out.println("[ERROR] 메뉴는 1이상 6이하의 숫자로만 입력 가능합니다.");
-            }
-        }
-    }
-
     public static Account chooseAccount(List<Account> accounts, Scanner scanner) {
         while (true) {
             try {
@@ -140,8 +117,43 @@ public class InputView {
         }
     }
 
-    public static String requestAccountPassword() {
-        // TODO: 계좌 새로 생성 시 비밀번호 요청 프롬프트 (4자리 숫자)
-        return "1234";
+    public static String requestDepositAmount(Account account, Scanner scanner, boolean isFirst) {
+        if (isFirst) {
+            System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
+                    "                                         입     금                                  \n" +
+                    "       ----------------------------------------------------------------------------\n" +
+                    "       입금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
+        }
+        System.out.print("       입금할 금액을 입력해주세요(단위: 원) > ");
+        return scanner.nextLine();
+    }
+
+
+    public static String requestTransferAmount(Scanner scanner) {
+        System.out.println("BanKU: 송금할 금액을 입력해주세요(단위: 원) > ");
+        return scanner.nextLine();
+    }
+
+    public static String requestReceiverAccount(Account account, Scanner scanner, boolean isFirst) {
+
+        if (isFirst) {
+            System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
+                    "                                         송     금                                  \n" +
+                    "       ----------------------------------------------------------------------------\n" +
+                    "       송금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
+        }
+        System.out.print("       송금받을 계좌번호를 입력해주세요(-없이 숫자로만 입력해주세요) > ");
+        return scanner.nextLine();
+    }
+
+    public static String requestWithdrawalAmount(Account account, Scanner scanner, boolean isFirst) {
+        if (isFirst) {
+            System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
+                    "                                        출     금                                  \n" +
+                    "       ----------------------------------------------------------------------------\n" +
+                    "       출금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
+        }
+        System.out.print("       출금할 금액을 입력해주세요(단위: 원) > ");
+        return scanner.nextLine();
     }
 }

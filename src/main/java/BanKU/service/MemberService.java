@@ -4,6 +4,7 @@ import BanKU.domain.Account;
 import BanKU.domain.Member;
 import BanKU.repository.MemberRepository;
 import BanKU.view.InputView;
+import BanKU.view.OutputView;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -85,14 +86,28 @@ public class MemberService {
         }
     }
 
-    public void createAccount(Member member) {
+    public void createAccount(Member member, Scanner scanner) {
+        System.out.println("BanKU: ---------------------------------------------------------------------------\n" +
+                "                                     계 좌        생 성                             \n" +
+                "       ----------------------------------------------------------------------------");
+        OutputView.showAccounts(member.getAccounts());
         if (member.getAccounts().size() >= 3) {
-            System.out.println("[ERROR] 계좌가 3개 이상입니다. 추가 계좌를 생성할 수 없습니다.");
+            System.out.println("BanKU: 더이상 계좌를 생성할 수 없습니다.");
+            System.out.println("BanKU: 메뉴 화면으로 돌아갑니다.");            // TODO. 이렇게 변경하는게 더 좋을 것 같은데 어떻게 생각하시나요?
             return;
         }
         String accountNumber = generateUniqueAccountNumber();
-        String password = InputView.requestAccountPassword();
-
+        String password;
+        System.out.println("BanKU: 해당 계좌의 비밀번호(4자리 숫자)를 설정해주세요.\n" +
+                "-----------------------------------------------------------------------------------\n");
+        while (true) {
+            System.out.print("비밀번호 > ");
+            password = scanner.nextLine();
+            if (password.matches("\\d{4}")) {
+                break;
+            }
+            System.out.println("[ERROR] 올바르지 않은 입력입니다. 위 규칙에 알맞은 비밀번호를 입력해주세요");
+        }
         Account account = new Account(accountNumber, password);
         member.addAccount(account);
         memberRepository.saveAccount(member, account);

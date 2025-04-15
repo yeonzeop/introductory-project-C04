@@ -2,7 +2,7 @@ package BanKU.utils;
 
 public class TransactionValidator {
 
-    private final static long AMOUNT_LIMIT = 10_000_000L;
+    public final static long AMOUNT_LIMIT = 10_000_000L;
 
     public static String validateAccountNumber(String rawAccountNumber) {
         String accountNumber = rawAccountNumber.trim();
@@ -19,16 +19,20 @@ public class TransactionValidator {
      */
     public static long validateAmount(String rawAmount) {
         if (!rawAmount.matches("\\d+")) {
-            throw new IllegalArgumentException("[ERROR] 거래 금액에 숫자가 아닌 문자열이 포함되어 있습니다.");
+            throw new IllegalArgumentException("[ERROR] 금액은 숫자로만 입력 가능합니다. 원 단위에 맞춰 금액을 다시 입력해주세요.");
         }
-        long amount = Long.parseLong(rawAmount);
-        if (amount > AMOUNT_LIMIT) {
+        try {
+            long amount = Long.parseLong(rawAmount);
+            if (amount > AMOUNT_LIMIT) {
+                throw new IllegalArgumentException("[WARNING] 거래 금액 한도를 초과하여 누락된 거래 내역이 있습니다.");
+            }
+            if (amount < 0) {
+                throw new IllegalArgumentException("[ERROR] 거래 금액은 양수여야 합니다.");
+            }
+            return amount;
+        } catch (NumberFormatException e) {
             throw new IllegalArgumentException("[WARNING] 거래 금액 한도를 초과하여 누락된 거래 내역이 있습니다.");
         }
-        if (amount < 0) {
-            throw new IllegalArgumentException("[ERROR] 거래 금액은 양수여야 합니다.");
-        }
-        return amount;
     }
 
     /**

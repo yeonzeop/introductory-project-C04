@@ -38,7 +38,6 @@ public class MemberRepository {
                 .forEach(member -> {
                     addMember(member);
                     addAccount(member.getAccounts());
-//                    System.out.println(member.toString());
                 });
     }
 
@@ -98,5 +97,15 @@ public class MemberRepository {
 
     public boolean isExistingLoginId(String loginId) {
         return membersByLoginId.containsKey(loginId);
+    }
+
+
+    // 로깅용 임시 메서드
+    public void printAccounts() {
+        System.out.println("[printAccounts]");
+        for (Account account : accounts.values()) {
+            System.out.println(account.toString());
+        }
+        System.out.println();
     }
 }

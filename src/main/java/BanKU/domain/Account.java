@@ -19,7 +19,7 @@ public class Account {
     public void plus(long amount) {
         // 오버플로우 검사
         if (balance > Long.MAX_VALUE - amount) {
-            throw new IllegalArgumentException("[WARNING] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
+            throw new IllegalArgumentException("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
         }
         balance += amount;
     }
@@ -27,7 +27,7 @@ public class Account {
     public void minus(long amount) {
         // 음수 검사
         if (balance - amount < 0) {
-            throw new IllegalArgumentException("[WARNING] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
+            throw new IllegalArgumentException("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
         }
         balance -= amount;
     }
@@ -52,5 +52,9 @@ public class Account {
 
     public long getBalance() {
         return balance;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
