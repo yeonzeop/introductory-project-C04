@@ -17,7 +17,8 @@ public class DateService {
         while (true) {
             try {
                 MonthDay nowDate = InputView.requestNowDate(scanner);
-                return dateRepository.isAfterLastDate(nowDate);
+                MonthDay now = dateRepository.isAfterLastDate(nowDate);
+                dateRepository.save(now);
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }

@@ -50,10 +50,6 @@ public class DateRepository {
         }
     }
 
-    public void addNowDate(MonthDay nowDate) {
-        // TODO. 파일에 날짜 추가하기
-    }
-
     public MonthDay isAfterLastDate(MonthDay nowDate) {
         if (dates.isEmpty()){
             dates.add(nowDate);      // date.txt 파일이 비어있는 경우 모든 날짜가 가능하도록 처리
@@ -64,5 +60,9 @@ public class DateRepository {
             throw new IllegalArgumentException("[ERROR] "+lastDate +"보다 이후의 날짜여야 합니다. \n 현재 날짜를 다시 입력해주세요.");
         }
         return nowDate;
+    }
+
+    public void save(MonthDay now) {
+        // TODO. 날짜 파일에 오늘 날짜 저장
     }
 }
