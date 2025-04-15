@@ -2,12 +2,15 @@ package BanKU.view;
 
 import BanKU.domain.Account;
 import BanKU.enums.Menu;
+import BanKU.enums.TransactionType;
 
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.List;
 import java.util.Scanner;
 
+import static BanKU.enums.TransactionType.DEPOSIT;
+import static BanKU.enums.TransactionType.WITHDRAWAL;
 import static BanKU.utils.DateValidator.validateDate;
 import static BanKU.utils.MemberValidator.*;
 import static BanKU.utils.TransactionValidator.validateAccountNumber;
@@ -117,25 +120,7 @@ public class InputView {
         }
     }
 
-    public static String requestDepositAmount(Account account, Scanner scanner, boolean isFirst) {
-        if (isFirst) {
-            System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
-                    "                                         입     금                                  \n" +
-                    "       ----------------------------------------------------------------------------\n" +
-                    "       입금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
-        }
-        System.out.print("       입금할 금액을 입력해주세요(단위: 원) > ");
-        return scanner.nextLine();
-    }
-
-
-    public static String requestTransferAmount(Scanner scanner) {
-        System.out.println("BanKU: 송금할 금액을 입력해주세요(단위: 원) > ");
-        return scanner.nextLine();
-    }
-
     public static String requestReceiverAccount(Account account, Scanner scanner, boolean isFirst) {
-
         if (isFirst) {
             System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
                     "                                         송     금                                  \n" +
@@ -146,14 +131,26 @@ public class InputView {
         return scanner.nextLine();
     }
 
-    public static String requestWithdrawalAmount(Account account, Scanner scanner, boolean isFirst) {
-        if (isFirst) {
-            System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
-                    "                                        출     금                                  \n" +
-                    "       ----------------------------------------------------------------------------\n" +
-                    "       출금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
+    public static String requestAmount(Account account, Scanner scanner, TransactionType type,  boolean isFirst) {
+        if (type == DEPOSIT) {
+            if (isFirst) {
+                System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
+                        "                                         입     금                                  \n" +
+                        "       ----------------------------------------------------------------------------\n" +
+                        "       입금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
+            }
+            System.out.print("       입금할 금액을 입력해주세요(단위: 원) > ");
+        } else if (type == WITHDRAWAL){
+            if (isFirst) {
+                System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
+                        "                                        출     금                                  \n" +
+                        "       ----------------------------------------------------------------------------\n" +
+                        "       출금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
+            }
+            System.out.print("       출금할 금액을 입력해주세요(단위: 원) > ");
+        } else {
+            System.out.print("BanKU: 송금할 금액을 입력해주세요(단위: 원) > ");
         }
-        System.out.print("       출금할 금액을 입력해주세요(단위: 원) > ");
         return scanner.nextLine();
     }
 }
