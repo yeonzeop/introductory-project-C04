@@ -19,4 +19,9 @@ public enum TransactionType {
         }
         throw new IllegalArgumentException("[ERROR] 잘못된 거래 유형입니다. type = " + type);
     }
+
+    @Override
+    public String toString(){
+        return type;
+    }
 }
