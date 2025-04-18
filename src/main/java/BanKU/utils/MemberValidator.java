@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MemberValidator {
 
@@ -124,7 +125,7 @@ public class MemberValidator {
         }
         return Arrays.stream(accounts)
                 .map(MemberValidator::validateAccount)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**

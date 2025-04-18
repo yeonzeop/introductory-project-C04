@@ -63,6 +63,8 @@ public class Member {
         return name;
     }
 
+    public LocalDate getBirthday() { return birthday; } // 만들어도 되나요..?
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
