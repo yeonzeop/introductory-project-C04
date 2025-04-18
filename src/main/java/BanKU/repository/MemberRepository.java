@@ -77,7 +77,6 @@ public class MemberRepository {
         Path path = Paths.get(USER_FILE_PATH);
         try {
             List<String> originalLines = Files.readAllLines(path);
-
             originalLines.add(0, newLine); // 새 줄을 맨 위에 삽입
 
             Files.write(path, originalLines); // 전체 내용 다시 파일에 쓰기
@@ -102,24 +101,15 @@ public class MemberRepository {
 
                 if (parts[0].equals(member.getLoginId().toLowerCase())) {
 
-
-                    String existingAccounts = (parts.length >= 6) ? parts[parts.length - 1] : "";
-
-
                     String newAccountStr;
-                    if (existingAccounts.isEmpty()) {
-                        newAccountStr = account.getAccountNumber() + "&" +
-                                account.getPassword();
-                        existingAccounts = newAccountStr;
+                    if (parts.length < 6) {
+                        newAccountStr = account.getAccountNumber() + "&" + account.getPassword();
                     } else {
-                        newAccountStr = "&" + account.getAccountNumber() +
-                                account.getPassword();
-                        existingAccounts += newAccountStr;
+                        newAccountStr = "%" + account.getAccountNumber() + "&" + account.getPassword();
                     }
-
                     // 새로 갱신된 라인 만들기
 
-                    lines.set(i, line + existingAccounts);
+                    lines.set(i, line + newAccountStr);
                     break;
                 }
             }
