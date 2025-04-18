@@ -10,6 +10,7 @@ import BanKU.repository.TransactionRepository;
 import BanKU.view.InputView;
 import BanKU.view.OutputView;
 
+import java.io.IOException;
 import java.time.MonthDay;
 import java.util.List;
 import java.util.Scanner;
@@ -35,47 +36,57 @@ public class AccountService {
     }
 
     public void deposit(Account account, Scanner scanner) {
-        long amount = getAmount(account, scanner, DEPOSIT);
-        Transaction transaction = new Transaction(
-                account.getAccountNumber(),
-                now,
-                DEPOSIT,
-                account.getAccountNumber(),
-                amount,
-                "");
-        if (account.getBalance() > Long.MAX_VALUE - amount) {
-            System.out.println("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
-            account.deactivate();
-            return;
+        try{
+            long amount = getAmount(account, scanner, DEPOSIT);
+            Transaction transaction = new Transaction(
+                    account.getAccountNumber(),
+                    now,
+                    DEPOSIT,
+                    account.getAccountNumber(),
+                    amount,
+                    "");
+            if (account.getBalance() > Long.MAX_VALUE - amount) {
+                System.out.println("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
+                account.deactivate();
+                return;
+            }
+            checkAccountPassword(account, scanner);
+            transactionRepository.save(transaction);
+            transaction.applyToAccounts(account);
+            System.out.println("BanKU: 입금이 완료되었습니다.\n" +
+                    "       입금한 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원");
+        }catch(IOException e){
+            System.out.println("[ERROR] transaction.txt 파일에 저장할 수 없습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
         }
-        checkAccountPassword(account, scanner);
-        transactionRepository.save(transaction);
-        transaction.applyToAccounts(account);
-        System.out.println("BanKU: 입금이 완료되었습니다.\n" +
-                "       입금한 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원");
     }
 
 
     public void withdrawal(Account account, Scanner scanner) {
-        long amount = getAmount(account, scanner, WITHDRAWAL);
-        Transaction transaction = new Transaction(
-                account.getAccountNumber(),
-                now,
-                WITHDRAWAL,
-                account.getAccountNumber(),
-                amount,
-                "");
-        if (account.getBalance() < amount) {
-            System.out.println("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
-            account.deactivate();
-            return;
-        }
-        checkAccountPassword(account, scanner);
+        try {
+            long amount = getAmount(account, scanner, WITHDRAWAL);
+            Transaction transaction = new Transaction(
+                    account.getAccountNumber(),
+                    now,
+                    WITHDRAWAL,
+                    account.getAccountNumber(),
+                    amount,
+                    "");
+            if (account.getBalance() < amount) {
+                System.out.println("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
+                account.deactivate();
+                return;
+            }
+            checkAccountPassword(account, scanner);
 
-        transactionRepository.save(transaction);
-        transaction.applyToAccounts(account);
-        System.out.println("BanKU: 출금이 완료되었습니다.\n" +
-                "       출금한 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원");
+            transactionRepository.save(transaction);
+            transaction.applyToAccounts(account);
+            System.out.println("BanKU: 출금이 완료되었습니다.\n" +
+                    "       출금한 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원");
+        }catch(IOException e){
+            System.out.println("[ERROR] transaction.txt 파일에 저장할 수 없습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        }
     }
 
     private long getAmount(Account account, Scanner scanner, TransactionType type) {
@@ -123,39 +134,44 @@ public class AccountService {
     }
 
     public void transfer(Account senderAccount, Scanner scanner) {
-        boolean isFirstPrint = true;
-        Account receiverAccount = getReceiverAccount(senderAccount, scanner, isFirstPrint);
-        long amount = getAmount(senderAccount, scanner, TRANSFER);
-        if (receiverAccount.getBalance() > Long.MAX_VALUE - amount) {
-            System.out.println("BanKU: 계좌 잔액 문제가 발생하여 해당 계좌를 비활성화 합니다. [비활성 계좌: " + receiverAccount.getAccountNumber() + "]");
-            receiverAccount.deactivate();
-            return;
+        try {
+            boolean isFirstPrint = true;
+            Account receiverAccount = getReceiverAccount(senderAccount, scanner, isFirstPrint);
+            long amount = getAmount(senderAccount, scanner, TRANSFER);
+            if (receiverAccount.getBalance() > Long.MAX_VALUE - amount) {
+                System.out.println("BanKU: 계좌 잔액 문제가 발생하여 해당 계좌를 비활성화 합니다. [비활성 계좌: " + receiverAccount.getAccountNumber() + "]");
+                receiverAccount.deactivate();
+                return;
+            }
+            checkAccountPassword(senderAccount, scanner);
+            String memo = requestMemo(scanner);
+
+            Transaction receiveTransaction = new Transaction(
+                    senderAccount.getAccountNumber(),
+                    now,
+                    DEPOSIT,
+                    receiverAccount.getAccountNumber(),
+                    amount,
+                    memo);
+            Transaction sendTransaction = new Transaction(
+                    receiverAccount.getAccountNumber(),
+                    now,
+                    WITHDRAWAL,
+                    senderAccount.getAccountNumber(),
+                    amount,
+                    memo);
+            receiveTransaction.applyToAccounts(receiverAccount);
+            sendTransaction.applyToAccounts(senderAccount);
+
+            transactionRepository.save(receiveTransaction);
+            transactionRepository.save(sendTransaction);
+
+            System.out.println("BanKU: 송금이 완료되었습니다.\n" +
+                    "       송금한 계좌(사용자 계좌): " + senderAccount.getAccountNumber() + " 잔액(단위: 원): " + senderAccount.getBalance() + "원");
+        }catch (IOException e){
+            System.out.println("[ERROR] transaction.txt 파일에 저장할 수 없습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
         }
-        checkAccountPassword(senderAccount, scanner);
-        String memo = requestMemo(scanner);
-
-        Transaction receiveTransaction = new Transaction(
-                senderAccount.getAccountNumber(),
-                now,
-                DEPOSIT,
-                receiverAccount.getAccountNumber(),
-                amount,
-                memo);
-        Transaction sendTransaction = new Transaction(
-                receiverAccount.getAccountNumber(),
-                now,
-                WITHDRAWAL,
-                senderAccount.getAccountNumber(),
-                amount,
-                memo);
-        receiveTransaction.applyToAccounts(receiverAccount);
-        sendTransaction.applyToAccounts(senderAccount);
-
-        transactionRepository.save(receiveTransaction);
-        transactionRepository.save(sendTransaction);
-
-        System.out.println("BanKU: 송금이 완료되었습니다.\n" +
-                "       송금한 계좌(사용자 계좌): " + senderAccount.getAccountNumber() + " 잔액(단위: 원): " + senderAccount.getBalance() + "원");
 
     }
 
