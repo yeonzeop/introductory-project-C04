@@ -81,19 +81,24 @@ public class TransactionRepository {
         Path path = Paths.get(TRANSACTION_FILE_PATH);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
 
-        String str ="";
-        str +=transaction.getSenderAccountNumber() + "|";
-        str +=transaction.getDate().format(formatter) + "|";
-        str +=transaction.getType().toString() + "|";
-        str +=transaction.getReceiverAccountNumber() + "|";
-        if(!transaction.getMemo().equals("")){
-            str +=transaction.getAmount() + "|";
-            str +=transaction.getMemo() +"\n";
-        }else{
-            str +=transaction.getAmount() + "\n";
-        }
+        String str = getString(transaction, formatter);
         validLines.add(str);
         Files.write(path, validLines);
+    }
+
+    private static String getString(Transaction transaction, DateTimeFormatter formatter) {
+        String str ="";
+        str += transaction.getSenderAccountNumber() + "|";
+        str += transaction.getDate().format(formatter) + "|";
+        str += transaction.getType().toString() + "|";
+        str += transaction.getReceiverAccountNumber() + "|";
+        if(!transaction.getMemo().equals("")){
+            str += transaction.getAmount() + "|";
+            str += transaction.getMemo() +"\n";
+        }else{
+            str += transaction.getAmount() + "\n";
+        }
+        return str;
     }
 
     public void printTransactions() {
