@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +65,70 @@ public class MemberRepository {
 
     public void saveMember(Member member) {
         // TODO. 파일에 회원정보 저장 (추가하기)
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+        String newLine =
+                member.getLoginId().toLowerCase() + "|" +
+                        member.getPassword() + "|" +
+                        member.getName() + "|" +
+                        member.getBirthday().format(formatter) + "|" +
+                        member.getPhoneNumber() + "|";
+
+
+        Path path = Paths.get(USER_FILE_PATH);
+        try {
+            List<String> originalLines = Files.readAllLines(path);
+
+            originalLines.add(0, newLine); // 새 줄을 맨 위에 삽입
+
+            Files.write(path, originalLines); // 전체 내용 다시 파일에 쓰기
+        } catch (IOException e) {
+            System.out.println("[ERROR] 회원 정보를 파일에 저장하는 데 실패했습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        }
+
     }
+
 
     public void saveAccount(Member member, Account account) {
         // TODO. 파일에서 member에 해당하는 행 찾아서 account 추가하기
+        Path path = Paths.get(USER_FILE_PATH);
+
+        try {
+            List<String> lines = Files.readAllLines(path);
+
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                String[] parts = line.split("\\|");
+
+                if (parts[0].equals(member.getLoginId().toLowerCase())) {
+
+
+                    String existingAccounts = (parts.length >= 6) ? parts[parts.length - 1] : "";
+
+
+                    String newAccountStr;
+                    if (existingAccounts.isEmpty()) {
+                        newAccountStr = account.getAccountNumber() + "&" +
+                                account.getPassword();
+                        existingAccounts = newAccountStr;
+                    } else {
+                        newAccountStr = "&" + account.getAccountNumber() +
+                                account.getPassword();
+                        existingAccounts += newAccountStr;
+                    }
+
+                    // 새로 갱신된 라인 만들기
+
+                    lines.set(i, line + existingAccounts);
+                    break;
+                }
+            }
+
+            Files.write(path, lines);
+        } catch (IOException e) {
+            System.out.println("[ERROR] 계좌 정보를 파일에 저장하는 데 실패했습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        }
     }
 
     public boolean isPresentAccount(String accountNumber) {
