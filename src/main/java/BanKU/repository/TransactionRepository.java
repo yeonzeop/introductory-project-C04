@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class TransactionRepository {
                 .getDate()
                 .isBefore(transaction.getDate());
         if (!isValidDate) {
-            System.out.println("[WARNING] 거래내역 데이터에 손실이 있습니다. 해당 행을 무시합니다. 날짜: " + transaction.getDate());
+            throw new IllegalArgumentException("[WARNING] 거래내역 데이터에 손실이 있습니다. 해당 행을 무시합니다. 날짜: " + transaction.getDate());
         }
     }
 
@@ -75,8 +76,29 @@ public class TransactionRepository {
 
 
 
-    public void save(Transaction transaction) {
+    public void save(Transaction transaction) throws IOException {
         // TODO. transaction.txt 파일에 transaction 추가하기
+        Path path = Paths.get(TRANSACTION_FILE_PATH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+
+        String str = getString(transaction, formatter);
+        validLines.add(str);
+        Files.write(path, validLines);
+    }
+
+    private static String getString(Transaction transaction, DateTimeFormatter formatter) {
+        String str ="";
+        str += transaction.getSenderAccountNumber() + "|";
+        str += transaction.getDate().format(formatter) + "|";
+        str += transaction.getType().toString() + "|";
+        str += transaction.getReceiverAccountNumber() + "|";
+        if(!transaction.getMemo().equals("")){
+            str += transaction.getAmount() + "|";
+            str += transaction.getMemo() +"\n";
+        }else{
+            str += transaction.getAmount() + "\n";
+        }
+        return str;
     }
 
     public void printTransactions() {

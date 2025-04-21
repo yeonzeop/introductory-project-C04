@@ -4,6 +4,7 @@ package BanKU.domain;
 import BanKU.enums.TransactionType;
 
 import java.time.MonthDay;
+import java.time.format.DateTimeFormatter;
 
 import static BanKU.enums.TransactionType.DEPOSIT;
 import static BanKU.utils.DateValidator.validateDate;
@@ -40,6 +41,10 @@ public class Transaction {
         return new Transaction(senderAccountNumber, date, type, receiverAccountNumber, amount, memo);
     }
 
+    public String getMemo() {
+        return memo;
+    }
+
     public void applyToAccounts(Account account) {
         if (type == DEPOSIT) {
             account.plus(amount);
@@ -60,12 +65,21 @@ public class Transaction {
         return receiverAccountNumber;
     }
 
+    public TransactionType getType() {
+        return type;
+    }
+
+    public long getAmount() {
+        return amount;
+    }
+
     @Override
     public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
         return "Transaction{" +
                 "senderAccountNumber='" + senderAccountNumber + '\'' +
-                ", date=" + date +
-                ", type=" + type +
+                ", date=" + date.format(formatter)+
+                ", type=" + type.toString() +
                 ", receiverAccountNumber='" + receiverAccountNumber + '\'' +
                 ", amount=" + amount +
                 ", memo='" + memo + '\'' +
