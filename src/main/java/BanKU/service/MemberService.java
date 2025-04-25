@@ -81,6 +81,7 @@ public class MemberService {
             String loginId = InputView.requestId(scanner, SIGNUP_ID);
             if (memberRepository.isExistingLoginId(loginId)) {
                 System.out.println("[ERROR] 이미 존재하는 아이디입니다. 다른 아이디를 입력해주세요.");
+                continue;
             }
             return loginId;
         }
