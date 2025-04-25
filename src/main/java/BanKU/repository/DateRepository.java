@@ -32,9 +32,18 @@ public class DateRepository {
     private void loadDateFile() throws IOException, URISyntaxException {
         Path path = Paths.get(DATE_FILE_PATH);
         Files.lines(path)
-                .map(DateValidator::validateDate)
+                .map(this::safeValidateDate)
                 .filter(Objects::nonNull)
                 .forEach(this::addDates);
+    }
+
+    private MonthDay safeValidateDate(String line) {
+        try {
+            return DateValidator.validateDate(line);
+        } catch (Exception e) {
+//            System.out.println("[WARNING] 잘못된 날짜 형식: " + line);
+            return null;
+        }
     }
 
     /**
@@ -44,21 +53,19 @@ public class DateRepository {
     private void addDates(MonthDay monthDay) {
         if (dates.isEmpty()) {
             dates.add(monthDay);
-//            System.out.println(monthDay.toString());
         } else if (dates.get(dates.size() - 1).isBefore(monthDay)) {
             dates.add(monthDay);
-//            System.out.println(monthDay.toString());
         }
     }
 
     public MonthDay isAfterLastDate(MonthDay nowDate) {
-        if (dates.isEmpty()){
+        if (dates.isEmpty()) {
             dates.add(nowDate);      // date.txt 파일이 비어있는 경우 모든 날짜가 가능하도록 처리
             return nowDate;
         }
         MonthDay lastDate = dates.get(dates.size() - 1);
-        if (!lastDate.isBefore(nowDate)){
-            throw new IllegalArgumentException("[ERROR] "+lastDate +"보다 이후의 날짜여야 합니다. \n 현재 날짜를 다시 입력해주세요.");
+        if (!lastDate.isBefore(nowDate)) {
+            throw new IllegalArgumentException("[ERROR] " + lastDate + "보다 이후의 날짜여야 합니다. \n 현재 날짜를 다시 입력해주세요.");
         }
         dates.add(nowDate);
         return nowDate;
@@ -74,5 +81,9 @@ public class DateRepository {
             rawDates.add(str);
         }
         Files.write(path,rawDates);
+    }
+
+    public MonthDay getNow() {
+        return dates.get(dates.size() - 1);
     }
 }

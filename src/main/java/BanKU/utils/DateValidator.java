@@ -4,7 +4,7 @@ import java.time.DateTimeException;
 import java.time.MonthDay;
 
 public class DateValidator {
-    public static MonthDay validateDate(String rawDate) throws DateTimeException {
+    public static MonthDay validateDate(String rawDate) {
         String date = rawDate.trim();
         // 숫자 형식은 맞지만 자릿수가 잘못됨 (예: 6자리, 3자리 등)
         if (date.matches("\\d+") && !date.matches("\\d{4}")) {

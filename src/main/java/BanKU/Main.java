@@ -2,11 +2,9 @@ package BanKU;
 
 
 import BanKU.controller.BanKUController;
-import BanKU.domain.Account;
 import BanKU.repository.DateRepository;
 import BanKU.repository.MemberRepository;
 import BanKU.repository.TransactionRepository;
-import BanKU.view.InputView;
 
 public class Main {
 
