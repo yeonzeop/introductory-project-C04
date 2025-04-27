@@ -67,10 +67,10 @@ public class TransactionRepository {
         Account receiverAccount = memberRepository.findAccountByNumber(transaction.getReceiverAccountNumber());
 
         try {
-            transaction.applyToAccounts(receiverAccount);               // 거래 내역을 계좌 잔액에 반영
+            transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
         } catch (IllegalArgumentException e) {
             if (transaction.getType() == TransactionType.DEPOSIT) {
-                receiverAccount.deactivate();
+                senderAccount.deactivate();
             } else {
                 senderAccount.deactivate();
             }
