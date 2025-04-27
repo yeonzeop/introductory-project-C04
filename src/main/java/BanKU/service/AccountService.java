@@ -162,17 +162,17 @@ public class AccountService {
             String memo = requestMemo(scanner);
 
             Transaction receiveTransaction = new Transaction(
-                    senderAccount.getAccountNumber(),
+                    receiverAccount.getAccountNumber(),
                     now,
                     DEPOSIT,
-                    receiverAccount.getAccountNumber(),
+                    senderAccount.getAccountNumber(),
                     amount,
                     memo);
             Transaction sendTransaction = new Transaction(
-                    receiverAccount.getAccountNumber(),
+                    senderAccount.getAccountNumber(),
                     now,
                     WITHDRAWAL,
-                    senderAccount.getAccountNumber(),
+                    receiverAccount.getAccountNumber(),
                     amount,
                     memo);
             boolean applyReceive = applyTransactionToAccount(receiverAccount, receiveTransaction);
