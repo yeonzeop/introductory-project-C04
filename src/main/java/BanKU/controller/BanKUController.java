@@ -62,9 +62,15 @@ public class BanKUController {
                 case TRANSFER -> accountService.transfer(account, scanner);
                 case ACCOUNT_INQUIRY -> {
                     System.out.println("BanKU: -----------------------------------------------------------------------------------\n" +
-                                       "                                          계 좌     조 회                                   \n" +
-                                       "       -----------------------------------------------------------------------------------");
+                            "                                          계 좌     조 회                                   \n" +
+                            "       -----------------------------------------------------------------------------------");
                     OutputView.showAccounts(member.getAccounts());
+                    while (true) {
+                        System.out.print("BanKU: 메뉴로 돌아가시려면 'y' 혹은 'Y'키를 입력해주세요> ");
+                        if (scanner.nextLine().trim().equalsIgnoreCase("y")) {
+                            break;
+                        }
+                    }
                 }
                 case ACCOUNT_CREATION -> memberService.createAccount(nowDate, member, scanner);
                 case QUIT -> {

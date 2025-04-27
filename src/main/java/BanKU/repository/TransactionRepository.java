@@ -2,6 +2,7 @@ package BanKU.repository;
 
 import BanKU.domain.Account;
 import BanKU.domain.Transaction;
+import BanKU.enums.TransactionType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,38 +66,38 @@ public class TransactionRepository {
         Account senderAccount = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
         Account receiverAccount = memberRepository.findAccountByNumber(transaction.getReceiverAccountNumber());
 
-        // TODO. Q. 비활성 계좌는 member의 account 에서도 제거해야하나?? 아직은 삭제 X
-        // TODO. Q. 모든 거래내역에 대해서 (입금, 출금 모두) receiverAccount 에만 잔액이 수정되도록 설정해둠
-        transaction.applyToAccounts(receiverAccount);               // 거래 내역을 계좌 잔액에 반영
-
-        // 비활성화 상태가 된 계좌 처리 : 이미 처리된 거래 내역 -> 그냥 냅둠 (유효)
-        //                         이후에 처리할 거래 내역 -> 무시 & 파일에서 삭제
-
+        try {
+            transaction.applyToAccounts(receiverAccount);               // 거래 내역을 계좌 잔액에 반영
+        } catch (IllegalArgumentException e) {
+            if (transaction.getType() == TransactionType.DEPOSIT) {
+                receiverAccount.deactivate();
+            } else {
+                senderAccount.deactivate();
+            }
+            System.out.println(e.getMessage());
+        }
     }
 
 
-
     public void save(Transaction transaction) throws IOException {
-        // TODO. transaction.txt 파일에 transaction 추가하기
         Path path = Paths.get(TRANSACTION_FILE_PATH);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
-
         String str = getString(transaction, formatter);
         validLines.add(str);
         Files.write(path, validLines);
     }
 
     private static String getString(Transaction transaction, DateTimeFormatter formatter) {
-        String str ="";
+        String str = "";
         str += transaction.getSenderAccountNumber() + "|";
         str += transaction.getDate().format(formatter) + "|";
         str += transaction.getType().toString() + "|";
         str += transaction.getReceiverAccountNumber() + "|";
-        if(!transaction.getMemo().equals("")){
+        if (!transaction.getMemo().equals("")) {
             str += transaction.getAmount() + "|";
-            str += transaction.getMemo() +"\n";
-        }else{
-            str += transaction.getAmount() + "\n";
+            str += transaction.getMemo();
+        } else {
+            str += transaction.getAmount();
         }
         return str;
     }

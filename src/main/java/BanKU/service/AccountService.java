@@ -36,7 +36,7 @@ public class AccountService {
     }
 
     public void deposit(Account account, Scanner scanner) {
-        try{
+        try {
             long amount = getAmount(account, scanner, DEPOSIT);
             Transaction transaction = new Transaction(
                     account.getAccountNumber(),
@@ -51,11 +51,13 @@ public class AccountService {
                 return;
             }
             checkAccountPassword(account, scanner);
+            if (!applyTransactionToAccount(account, transaction)) {
+                return;
+            }
             transactionRepository.save(transaction);
-            transaction.applyToAccounts(account);
             System.out.println("BanKU: 입금이 완료되었습니다.\n" +
                     "       입금한 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원");
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("[ERROR] transaction.txt 파일에 저장할 수 없습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
         }
@@ -80,12 +82,25 @@ public class AccountService {
             checkAccountPassword(account, scanner);
 
             transactionRepository.save(transaction);
-            transaction.applyToAccounts(account);
+            if (!applyTransactionToAccount(account, transaction)) {
+                return;
+            }
             System.out.println("BanKU: 출금이 완료되었습니다.\n" +
                     "       출금한 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원");
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("[ERROR] transaction.txt 파일에 저장할 수 없습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        }
+    }
+
+    private boolean applyTransactionToAccount(Account account, Transaction transaction) {
+        try {
+            transaction.applyToAccounts(account);
+            return true;
+        } catch (IllegalArgumentException e) {
+            account.deactivate();
+            System.out.println(e.getMessage());
+            return false;
         }
     }
 
@@ -120,7 +135,7 @@ public class AccountService {
     private void checkAccountPassword(Account account, Scanner scanner) {
         while (true) {
             System.out.print("BanKU: 계좌 비밀번호를 입력해주세요(숫자 4자리로 입력해주세요) > ");
-            String password = scanner.nextLine();
+            String password = scanner.nextLine().trim();
             if (!password.matches("\\d{4}")) {
                 System.out.println("[ERROR] 계좌 비밀번호는 숫자로만 입력 가능합니다. 비밀번호를 다시 입력해주세요.");
                 continue;
@@ -160,15 +175,17 @@ public class AccountService {
                     senderAccount.getAccountNumber(),
                     amount,
                     memo);
-            receiveTransaction.applyToAccounts(receiverAccount);
-            sendTransaction.applyToAccounts(senderAccount);
-
+            boolean applyReceive = applyTransactionToAccount(receiverAccount, receiveTransaction);
+            boolean applySend = applyTransactionToAccount(senderAccount, sendTransaction);
+            if (!(applyReceive && applySend)) {
+                return;
+            }
             transactionRepository.save(receiveTransaction);
             transactionRepository.save(sendTransaction);
 
             System.out.println("BanKU: 송금이 완료되었습니다.\n" +
                     "       송금한 계좌(사용자 계좌): " + senderAccount.getAccountNumber() + " 잔액(단위: 원): " + senderAccount.getBalance() + "원");
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("[ERROR] transaction.txt 파일에 저장할 수 없습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
         }
@@ -200,9 +217,11 @@ public class AccountService {
                 System.out.println("[ERROR] 메모에 구분자가 포함될 수 없습니다. 다시 입력해주세요.");
                 continue;
             }
-            break;
+            if (memo.length() > 10) {
+                return memo.substring(0, 10); // 10자까지만 자르기
+            }
+            return memo;
         }
-        return memo;
     }
 
     public void setNow(MonthDay now) {

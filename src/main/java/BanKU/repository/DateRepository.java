@@ -60,28 +60,24 @@ public class DateRepository {
         }
     }
 
-    public MonthDay isAfterLastDate(MonthDay nowDate) {
+    public void isAfterLastDate(MonthDay nowDate) {
         if (dates.isEmpty()) {
-            dates.add(nowDate);      // date.txt 파일이 비어있는 경우 모든 날짜가 가능하도록 처리
-            return nowDate;
+            return;      // date.txt 파일이 비어있는 경우 모든 날짜가 가능하도록 처리
         }
         MonthDay lastDate = dates.get(dates.size() - 1);
         if (!lastDate.isBefore(nowDate)) {
             throw new IllegalArgumentException("[ERROR] " + lastDate.format(formatter) + " 보다 이후의 날짜여야 합니다. 현재 날짜를 다시 입력해주세요.");
         }
-        dates.add(nowDate);
-        return nowDate;
     }
 
     public void save(MonthDay now) throws IOException {
-        // TODO. 날짜 파일에 오늘 날짜 저장
         Path path = Paths.get(DATE_FILE_PATH);
+        dates.add(now);
         List<String> rawDates = new ArrayList<>();
         for(MonthDay date:dates){
             String str = date.format(formatter);
             rawDates.add(str);
         }
-        rawDates.add(now.format(formatter));
         Files.write(path,rawDates);
     }
 

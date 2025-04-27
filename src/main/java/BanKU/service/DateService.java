@@ -20,9 +20,9 @@ public class DateService {
         while (true) {
             try {
                 MonthDay nowDate = validateDate(InputView.requestNowDate(scanner));
-                MonthDay now = dateRepository.isAfterLastDate(nowDate);
-                dateRepository.save(now);
-                return now;
+                dateRepository.isAfterLastDate(nowDate);
+                dateRepository.save(nowDate);
+                return nowDate;
             } catch (IllegalArgumentException | IOException e) {
                 System.out.println(e.getMessage());
             }

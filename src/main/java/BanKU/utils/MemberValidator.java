@@ -19,9 +19,9 @@ public class MemberValidator {
     public static String validateLoginId(String rawLoginId) {
         String loginId = rawLoginId.trim().toUpperCase();
         if (!loginId.matches("^[a-zA-Z0-9]+$")) {
-            throw new IllegalArgumentException("[ERROR] 아이디는 2자 이상 10자 이하의 숫자 또는 영문자로만 입력해주세요.");
+            throw new IllegalArgumentException("[ERROR] 아이디는 1자 이상 10자 이하의 숫자 또는 영문자로만 입력해주세요.");
         }
-        if (loginId.length() < 2 || loginId.length() > 10) {
+        if (loginId.length() < 1 || loginId.length() > 10) {
             throw new IllegalArgumentException("[ERROR] 10자 이내의 아이디를 입력해주세요");
         }
         return loginId;
