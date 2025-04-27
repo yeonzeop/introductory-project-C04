@@ -54,9 +54,9 @@ public class TransactionRepository {
         if (transactions.isEmpty()) {
             return;
         }
-        boolean isValidDate = transactions.get(transactions.size() - 1)
+        boolean isValidDate = !transactions.get(transactions.size() - 1)
                 .getDate()
-                .isBefore(transaction.getDate());
+                .isAfter(transaction.getDate());
         if (!isValidDate) {
             throw new IllegalArgumentException("[WARNING] 거래내역 데이터에 손실이 있습니다. 해당 행을 무시합니다. 날짜: " + transaction.getDate());
         }
