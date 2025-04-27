@@ -19,7 +19,7 @@ public enum Menu {
 
     public static Menu of(String rawMenu) throws IllegalArgumentException {
         if (!rawMenu.matches("\\d{1}")) {
-            System.out.println("[ERROR] 메뉴는 1이상 6이하의 숫자로만 입력 가능합니다.");
+            System.out.println("[ERROR] 올바른 번호를 입력해주세요.");
         }
         int intMenu = Integer.parseInt(rawMenu);
         for (Menu menu : values()) {
@@ -27,7 +27,7 @@ public enum Menu {
                 return menu;
             }
         }
-        System.out.println("[ERROR] 메뉴는 1이상 6이하의 숫자로만 입력 가능합니다.");
+        System.out.println("[ERROR] 올바른 번호를 입력해주세요.");
         return null;
     }
 

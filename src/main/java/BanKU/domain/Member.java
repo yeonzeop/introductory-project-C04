@@ -34,7 +34,7 @@ public class Member {
     }
 
     public static Member from(String[] memberInfos) {
-        if (memberInfos.length != 6) {
+        if (5 > memberInfos.length || memberInfos.length > 6) {
             System.out.println("[ERROR] 유효하지 않은 회원 정보가 데이터입니다. 해당 행을 무시합니다.");
             return null;
         }
@@ -44,7 +44,10 @@ public class Member {
             String name = validateName(memberInfos[2]);
             LocalDate birthday = validateBirthday(memberInfos[3]);
             String phoneNumber = validatePhoneNumber(memberInfos[4]);
-            List<Account> accounts = createAccounts(memberInfos[5]);
+            List<Account> accounts = new ArrayList<>();
+            if (memberInfos.length == 6) {
+                accounts = createAccounts(memberInfos[5]);
+            }
             return new Member(loginId, password, name, birthday, phoneNumber, accounts);
         } catch (IllegalArgumentException e) {
             return null;

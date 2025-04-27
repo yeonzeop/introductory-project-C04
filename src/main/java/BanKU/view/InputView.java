@@ -35,16 +35,10 @@ public class InputView {
         }
     }
 
-    public static MonthDay requestNowDate(Scanner scanner) {
-        while (true) {
-            System.out.print("BanKU: 날짜를 입력해주세요\n" +
+    public static String requestNowDate(Scanner scanner) {
+        System.out.print("BanKU: 날짜를 입력해주세요\n" +
                     "(MMDD 형식, 예: 0912) > ");
-            try {
-                return validateDate(scanner.nextLine());
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        }
+        return scanner.nextLine();
     }
 
     public static boolean isExistingMember(Scanner scanner) {

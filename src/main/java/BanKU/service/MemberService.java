@@ -8,6 +8,8 @@ import BanKU.view.OutputView;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.MonthDay;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class MemberService {
@@ -81,25 +83,33 @@ public class MemberService {
             String loginId = InputView.requestId(scanner, SIGNUP_ID);
             if (memberRepository.isExistingLoginId(loginId)) {
                 System.out.println("[ERROR] 이미 존재하는 아이디입니다. 다른 아이디를 입력해주세요.");
+                continue;
             }
             return loginId;
         }
     }
 
-    public void createAccount(Member member, Scanner scanner) {
+    public void createAccount(MonthDay nowDate, Member member, Scanner scanner) {
         System.out.println("BanKU: ---------------------------------------------------------------------------\n" +
                 "                                     계 좌        생 성                             \n" +
                 "       ----------------------------------------------------------------------------");
         OutputView.showAccounts(member.getAccounts());
         if (member.getAccounts().size() >= 3) {
             System.out.println("BanKU: 더이상 계좌를 생성할 수 없습니다.");
-            System.out.println("BanKU: 메뉴 화면으로 돌아갑니다.");            // TODO. 이렇게 변경하는게 더 좋을 것 같은데 어떻게 생각하시나요?
+            System.out.print("BanKU: 메뉴로 돌아가시려면 'y' 혹은 'Y'키를 입력해 주세요 > ");
+            while (true) {
+                if (scanner.nextLine().trim().equalsIgnoreCase("y")) {
+                    break;
+                }
+                System.out.print("[ERROR] 잘못된 입력입니다. 문자 ‘y’ 혹은 ‘Y’를 입력해주세요> ");
+            }
             return;
         }
-        String accountNumber = generateUniqueAccountNumber();
+
+        String accountNumber = generateUniqueAccountNumber(nowDate);
         String password;
         System.out.println("BanKU: 해당 계좌의 비밀번호(4자리 숫자)를 설정해주세요.\n" +
-                "-----------------------------------------------------------------------------------\n");
+                "-----------------------------------------------------------------------------------");
         while (true) {
             System.out.print("비밀번호 > ");
             password = scanner.nextLine();
@@ -111,16 +121,19 @@ public class MemberService {
         Account account = new Account(accountNumber, password);
         member.addAccount(account);
         memberRepository.saveAccount(member, account);
+        System.out.println("BanKU: 계좌번호: "+accountNumber+
+                "\nBanKU: 계좌 생성이 완료되었습니다.");
     }
 
-    private String generateUniqueAccountNumber() {
+    private String generateUniqueAccountNumber(MonthDay nowDate) {
         SecureRandom random = new SecureRandom();
         while (true) {
             StringBuilder sb = new StringBuilder();
             while (sb.length() < 8) {
                 sb.append(random.nextInt(10));      // 0~9 중 하나 추가
             }
-            String accountNumber = "1123" + sb.toString();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+            String accountNumber = nowDate.format(formatter) + sb.toString();
             if (memberRepository.isPresentAccount(accountNumber)) {
                 continue;
             }

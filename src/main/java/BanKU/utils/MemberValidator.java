@@ -19,9 +19,9 @@ public class MemberValidator {
     public static String validateLoginId(String rawLoginId) {
         String loginId = rawLoginId.trim().toUpperCase();
         if (!loginId.matches("^[a-zA-Z0-9]+$")) {
-            throw new IllegalArgumentException("[ERROR] 아이디는 2자 이상 10자 이하의 숫자 또는 영문자로만 입력해주세요.");
+            throw new IllegalArgumentException("[ERROR] 아이디는 1자 이상 10자 이하의 숫자 또는 영문자로만 입력해주세요.");
         }
-        if (loginId.length() < 2 || loginId.length() > 10) {
+        if (loginId.length() < 1 || loginId.length() > 10) {
             throw new IllegalArgumentException("[ERROR] 10자 이내의 아이디를 입력해주세요");
         }
         return loginId;
@@ -57,14 +57,9 @@ public class MemberValidator {
             throw new IllegalArgumentException("[ERROR] BanKU는 한글 이름만을 지원합니다.");
         }
 
-        if (!name.matches("^[가-힣]+$")) {
-            // 한글은 포함되어 있지만, 다른 문자와 혼합됨
-            throw new IllegalArgumentException("[ERROR] 한글 문자를 입력해주세요.");
-        }
-
-        if (!name.matches("^[가-힣]{2,4}$")) {
-            // 글자 수가 2~4자가 아님
-            throw new IllegalArgumentException("[ERROR] 한글 이름은 2자 이상 4자 이하로 입력해주세요.");
+        if (!name.matches("^[가-힣]+$") || !name.matches("^[가-힣]{2,4}$")) {
+            // 한글은 포함되어 있지만, 다른 문자와 혼합됨 or 글자 수가 2~4자가 아님
+            throw new IllegalArgumentException("[ERROR] 한글 문자는 자음과 모음으로 이루어진 2자 이상 4자 이하의 완전한 한글만 취급합니다.");
         }
         return name;
     }
@@ -120,7 +115,7 @@ public class MemberValidator {
     public static List<Account> createAccounts(String rawAccounts) {
         String accoutsInfo = rawAccounts.trim();
         String[] accounts = accoutsInfo.split("%");
-        if (accounts.length < 1 || accounts.length > 3) {
+        if (accounts.length > 3) {
             throw new IllegalArgumentException("[ERROR] 사용자의 계좌 개수가 1~3개 제한을 위반했습니다.");
         }
         return Arrays.stream(accounts)
@@ -132,7 +127,7 @@ public class MemberValidator {
      * 계좌번호 = 숫자 12 자리
      * - 12 자리가 아닌 숫자인 경우
      * - 숫자가 아닌 문자들이 섞여있는 경우
-     *
+     * <p>
      * 계좌 비밀번호 = 숫자 4 자리
      * - 4 자리가 아닌 숫자인 경우
      * - 숫자가 아닌 문자들이 섞여있는 경우

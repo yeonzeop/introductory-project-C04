@@ -78,7 +78,7 @@ public class Transaction {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
         return "Transaction{" +
                 "senderAccountNumber='" + senderAccountNumber + '\'' +
-                ", date=" + date.format(formatter)+
+                ", date=" + date.format(formatter) +
                 ", type=" + type.toString() +
                 ", receiverAccountNumber='" + receiverAccountNumber + '\'' +
                 ", amount=" + amount +
