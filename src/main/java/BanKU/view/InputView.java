@@ -45,10 +45,10 @@ public class InputView {
         while (true) {
             System.out.print("BanKU: 현재 회원이신가요? (y/n) > ");
             String answer = scanner.nextLine().trim();
-            if (answer.equals("y")) {
+            if (answer.equalsIgnoreCase("y")) {
                 return true;
             }
-            if (answer.equals("n")) {
+            if (answer.equalsIgnoreCase("n")) {
                 return false;
             }
             System.out.println("[ERROR] 영문자 y나 n 중 하나를 입력해주세요");

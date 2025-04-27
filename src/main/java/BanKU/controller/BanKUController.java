@@ -13,6 +13,7 @@ import BanKU.service.MemberService;
 import BanKU.view.OutputView;
 
 import java.time.MonthDay;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class BanKUController {
@@ -52,11 +53,8 @@ public class BanKUController {
         // 4. 메인메뉴로 나옴
         while (true) {
             OutputView.showMenu();
-            Menu menu = Menu.of(scanner.nextLine().trim());
-            if (menu == null) {
-                continue;
-            }
-            switch (menu) {
+            Menu menu = Menu.of(scanner);
+            switch (Objects.requireNonNull(menu)) {
                 case DEPOSIT -> accountService.deposit(account, scanner);
                 case WITHDRAWAL -> accountService.withdrawal(account, scanner);
                 case TRANSFER -> accountService.transfer(account, scanner);
