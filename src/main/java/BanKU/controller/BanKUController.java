@@ -63,10 +63,13 @@ public class BanKUController {
                             "                                          계 좌     조 회                                   \n" +
                             "       -----------------------------------------------------------------------------------");
                     OutputView.showAccounts(member.getAccounts());
+                    System.out.print("BanKU: 메뉴로 돌아가시려면 'y' 혹은 'Y'키를 입력해주세요> ");
                     while (true) {
-                        System.out.print("BanKU: 메뉴로 돌아가시려면 'y' 혹은 'Y'키를 입력해주세요> ");
+//                        System.out.print("BanKU: 메뉴로 돌아가시려면 'y' 혹은 'Y'키를 입력해주세요> ");
                         if (scanner.nextLine().trim().equalsIgnoreCase("y")) {
                             break;
+                        }else{
+                            System.out.print("[ERROR] 잘못된 입력입니다. 문자 'y' 혹은 'Y'를 입력해주세요>");
                         }
                     }
                 }
