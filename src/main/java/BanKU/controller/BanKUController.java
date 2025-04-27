@@ -30,6 +30,9 @@ public class BanKUController {
     public void run() {
         Scanner scanner = new Scanner(System.in);
         // 1. 날짜 입력받기
+        System.out.println("====================================== BanKU ======================================");
+        System.out.println("    Welcome! Start a better financial life with BanKU.");
+        System.out.println("----------------------------------------------------------------------------------\n");
         MonthDay nowDate = dateService.getNowDate(scanner);
         accountService.setNow(nowDate);
 
@@ -39,7 +42,7 @@ public class BanKUController {
         if (member.getAccounts().isEmpty()) {
             System.out.println("BanKU: 현재 사용자 명의로 된 계좌가 개설되어 있지 않습니다.\n" +
                     "새로운 계좌 개설을 위해 <계좌 개설 메뉴>로 이동하겠습니다.");
-            memberService.createAccount(member, scanner);
+            memberService.createAccount(nowDate, member, scanner);
         }
 
         // 3. 계좌 선택 (신규 회원인 경우 계좌 생성으로 바로 넘어가기)
@@ -63,7 +66,7 @@ public class BanKUController {
                                        "       -----------------------------------------------------------------------------------");
                     OutputView.showAccounts(member.getAccounts());
                 }
-                case ACCOUNT_CREATION -> memberService.createAccount(member, scanner);
+                case ACCOUNT_CREATION -> memberService.createAccount(nowDate, member, scanner);
                 case QUIT -> {
                     return;
                 }

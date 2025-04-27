@@ -19,6 +19,8 @@ import static BanKU.Main.DATE_FILE_PATH;
 public class DateRepository {
 
     private final List<MonthDay> dates = new ArrayList<>();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+
 
     public DateRepository() {
         try {
@@ -65,7 +67,7 @@ public class DateRepository {
         }
         MonthDay lastDate = dates.get(dates.size() - 1);
         if (!lastDate.isBefore(nowDate)) {
-            throw new IllegalArgumentException("[ERROR] " + lastDate + "보다 이후의 날짜여야 합니다. \n 현재 날짜를 다시 입력해주세요.");
+            throw new IllegalArgumentException("[ERROR] " + lastDate.format(formatter) + " 보다 이후의 날짜여야 합니다. 현재 날짜를 다시 입력해주세요.");
         }
         dates.add(nowDate);
         return nowDate;
@@ -74,12 +76,12 @@ public class DateRepository {
     public void save(MonthDay now) throws IOException {
         // TODO. 날짜 파일에 오늘 날짜 저장
         Path path = Paths.get(DATE_FILE_PATH);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
         List<String> rawDates = new ArrayList<>();
         for(MonthDay date:dates){
             String str = date.format(formatter);
             rawDates.add(str);
         }
+        rawDates.add(now.format(formatter));
         Files.write(path,rawDates);
     }
 

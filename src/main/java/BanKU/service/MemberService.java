@@ -8,6 +8,8 @@ import BanKU.view.OutputView;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.time.MonthDay;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class MemberService {
@@ -87,7 +89,7 @@ public class MemberService {
         }
     }
 
-    public void createAccount(Member member, Scanner scanner) {
+    public void createAccount(MonthDay nowDate, Member member, Scanner scanner) {
         System.out.println("BanKU: ---------------------------------------------------------------------------\n" +
                 "                                     계 좌        생 성                             \n" +
                 "       ----------------------------------------------------------------------------");
@@ -97,7 +99,7 @@ public class MemberService {
             System.out.println("BanKU: 메뉴 화면으로 돌아갑니다.");            // TODO. 이렇게 변경하는게 더 좋을 것 같은데 어떻게 생각하시나요?
             return;
         }
-        String accountNumber = generateUniqueAccountNumber();
+        String accountNumber = generateUniqueAccountNumber(nowDate);
         String password;
         System.out.println("BanKU: 해당 계좌의 비밀번호(4자리 숫자)를 설정해주세요.\n" +
                 "-----------------------------------------------------------------------------------\n");
@@ -114,14 +116,15 @@ public class MemberService {
         memberRepository.saveAccount(member, account);
     }
 
-    private String generateUniqueAccountNumber() {
+    private String generateUniqueAccountNumber(MonthDay nowDate) {
         SecureRandom random = new SecureRandom();
         while (true) {
             StringBuilder sb = new StringBuilder();
             while (sb.length() < 8) {
                 sb.append(random.nextInt(10));      // 0~9 중 하나 추가
             }
-            String accountNumber = "1123" + sb.toString();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+            String accountNumber = nowDate.format(formatter) + sb.toString();
             if (memberRepository.isPresentAccount(accountNumber)) {
                 continue;
             }

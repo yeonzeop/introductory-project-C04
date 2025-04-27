@@ -34,6 +34,10 @@ public class OutputView {
             System.out.println("       | " + accountNumber + " | " + balanceStr + " |");
             System.out.println("       +------------------------+--------------------------+");
         }
+
+        while (true) {
+
+        }
     }
 
     private static String centerAlign(String text, int width) {
