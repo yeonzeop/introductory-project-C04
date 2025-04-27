@@ -133,7 +133,7 @@ public class AccountService {
                 System.out.println("[ERROR] 거래 한도 10,000,000 원(일천만 원)보다 더 큰 금액은 거래가 불가능합니다.");
                 continue;
             }
-            if (amount < 0) {
+            if (amount <= 0) {
                 System.out.println("[ERROR] 거래 금액은 양수여야 합니다.");
                 continue;
             }

@@ -26,7 +26,7 @@ public class TransactionValidator {
             if (amount > AMOUNT_LIMIT) {
                 throw new IllegalArgumentException("[WARNING] 거래 금액 한도를 초과하여 누락된 거래 내역이 있습니다.");
             }
-            if (amount < 0) {
+            if (amount <= 0) {
                 throw new IllegalArgumentException("[ERROR] 거래 금액은 양수여야 합니다.");
             }
             return amount;
