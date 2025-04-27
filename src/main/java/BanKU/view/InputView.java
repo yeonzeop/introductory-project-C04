@@ -1,17 +1,14 @@
 package BanKU.view;
 
 import BanKU.domain.Account;
-import BanKU.enums.Menu;
 import BanKU.enums.TransactionType;
 
 import java.time.LocalDate;
-import java.time.MonthDay;
 import java.util.List;
 import java.util.Scanner;
 
 import static BanKU.enums.TransactionType.DEPOSIT;
 import static BanKU.enums.TransactionType.WITHDRAWAL;
-import static BanKU.utils.DateValidator.validateDate;
 import static BanKU.utils.MemberValidator.*;
 import static BanKU.utils.TransactionValidator.validateAccountNumber;
 
@@ -22,7 +19,7 @@ public class InputView {
         while (true) {
             try {
                 System.out.print("BanKU: 거래를 원하는 계좌번호를 입력해주세요(-없이 숫자로만 입력해주세요) > ");
-                String accountNumber = validateAccountNumber(scanner.nextLine());
+                String accountNumber = validateAccountNumber(scanner.nextLine().trim());
                 for (Account account : accounts) {
                     if (account.getAccountNumber().equals(accountNumber)) {
                         return account;
@@ -37,7 +34,7 @@ public class InputView {
 
     public static String requestNowDate(Scanner scanner) {
         System.out.print("BanKU: 날짜를 입력해주세요\n" +
-                    "(MMDD 형식, 예: 0912) > ");
+                "(MMDD 형식, 예: 0912) > ");
         return scanner.nextLine();
     }
 
@@ -122,10 +119,10 @@ public class InputView {
                     "       송금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
         }
         System.out.print("       송금받을 계좌번호를 입력해주세요(-없이 숫자로만 입력해주세요) > ");
-        return scanner.nextLine();
+        return scanner.nextLine().trim();
     }
 
-    public static String requestAmount(Account account, Scanner scanner, TransactionType type,  boolean isFirst) {
+    public static String requestAmount(Account account, Scanner scanner, TransactionType type, boolean isFirst) {
         if (type == DEPOSIT) {
             if (isFirst) {
                 System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
@@ -134,7 +131,7 @@ public class InputView {
                         "       입금할 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원\n");
             }
             System.out.print("       입금할 금액을 입력해주세요(단위: 원) > ");
-        } else if (type == WITHDRAWAL){
+        } else if (type == WITHDRAWAL) {
             if (isFirst) {
                 System.out.println("BanKU: ----------------------------------------------------------------------------\n" +
                         "                                        출     금                                  \n" +

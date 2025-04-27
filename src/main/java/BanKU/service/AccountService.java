@@ -194,14 +194,13 @@ public class AccountService {
 
     private Account getReceiverAccount(Account senderAccount, Scanner scanner, boolean isFirstPrint) {
         while (true) {
-            String rawReceiverAccountNumber = InputView.requestReceiverAccount(senderAccount, scanner, isFirstPrint);
-            String accountNumber = rawReceiverAccountNumber.trim();
+            String accountNumber = InputView.requestReceiverAccount(senderAccount, scanner, isFirstPrint);
             if (!accountNumber.matches("\\d{12}")) {
                 System.out.println("[ERROR] 계좌 번호는 -없이 숫자로만 입력가능합니다. 다시 입력해주세요.");
                 continue;
             }
             try {
-                return memberRepository.findAccountByNumber(rawReceiverAccountNumber);
+                return memberRepository.findAccountByNumber(accountNumber);
             } catch (IllegalArgumentException e) {
                 System.out.println("[ERROR] 존재하지 않는 계좌번호입니다. 다시 입력해주세요.");
             }
