@@ -52,7 +52,7 @@ public class BanKUController {
         // 4. 메인메뉴로 나옴
         while (true) {
             OutputView.showMenu();
-            Menu menu = Menu.of(scanner.nextLine());
+            Menu menu = Menu.of(scanner.nextLine().trim());
             if (menu == null) {
                 continue;
             }
@@ -74,10 +74,27 @@ public class BanKUController {
                 }
                 case ACCOUNT_CREATION -> memberService.createAccount(nowDate, member, scanner);
                 case QUIT -> {
-                    return;
+                    if (quit(scanner)) {
+                        return;
+                    }
                 }
             }
         }
+    }
+
+    private boolean quit(Scanner scanner) {
+        System.out.print("BanKU: 정말 종료하시겠습니까? (y/n) > ");
+        String input = scanner.nextLine().trim();
+        if (input.equalsIgnoreCase("y")) {
+            System.out.println("BanKU: -----------------------------------------------------------------------------");
+            System.out.println("                               BanKU를 이용해주셔서 감사합니다.                            ");
+            System.out.println("       -----------------------------------------------------------------------------");
+            return true;
+        }
+        if (!input.equalsIgnoreCase("n")) {
+            System.out.println("[ERROR] 올바른 응답문자를 입력해주세요. 메뉴 화면으로 돌아갑니다.");
+        }
+        return false;
     }
 }
 
