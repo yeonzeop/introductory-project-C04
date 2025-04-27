@@ -17,6 +17,7 @@ import java.util.Scanner;
 
 import static BanKU.enums.TransactionType.*;
 import static BanKU.utils.TransactionValidator.AMOUNT_LIMIT;
+import static BanKU.utils.TransactionValidator.validateAccountNumber;
 
 public class AccountService {
     private MonthDay now;
@@ -36,6 +37,10 @@ public class AccountService {
     }
 
     public void deposit(Account account, Scanner scanner) {
+        if (!account.isActive()) {
+            System.out.println("[ERROR] 비활성화된 계좌에 입금할 수 없습니다.");
+            return;
+        }
         try {
             long amount = getAmount(account, scanner, DEPOSIT);
             Transaction transaction = new Transaction(
@@ -65,6 +70,10 @@ public class AccountService {
 
 
     public void withdrawal(Account account, Scanner scanner) {
+        if (!account.isActive()) {
+            System.out.println("[ERROR] 비활성화된 계좌에서 출금할 수 없습니다.");
+            return;
+        }
         try {
             long amount = getAmount(account, scanner, WITHDRAWAL);
             Transaction transaction = new Transaction(
@@ -149,6 +158,10 @@ public class AccountService {
     }
 
     public void transfer(Account senderAccount, Scanner scanner) {
+        if (!senderAccount.isActive()) {
+            System.out.println("[ERROR] 비활성화된 계좌에서 송금할 수 없습니다.");
+            return;
+        }
         try {
             boolean isFirstPrint = true;
             Account receiverAccount = getReceiverAccount(senderAccount, scanner, isFirstPrint);
