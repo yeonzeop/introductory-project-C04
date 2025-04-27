@@ -35,10 +35,10 @@ public class MemberValidator {
     public static String validatePassword(String rawPassword) {
         String password = rawPassword.trim();
         if (password.length() != 6) {
-            throw new IllegalArgumentException("[ERROR] 숫자 6자리로만 구성된 비밀번호를 입력해주세요");
+            throw new IllegalArgumentException("[ERROR] 비밀번호를 다시 확인해주세요 -> [ERROR] 숫자 6자리로만 구성된 비밀번호를 입력해주세요");
         }
         if (!password.matches("\\d{6}")) {
-            throw new IllegalArgumentException("[ERROR] 숫자 6자리로만 구성된 비밀번호를 입력해주세요.");
+            throw new IllegalArgumentException("[ERROR] 비밀번호를 다시 확인해주세요 -> [ERROR] 숫자 6자리로만 구성된 비밀번호를 입력해주세요.");
         }
 
         return password;
