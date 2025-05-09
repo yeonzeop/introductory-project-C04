@@ -13,14 +13,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.time.LocalDate;
 
 import static BanKU.Main.DATE_FILE_PATH;
 
 public class DateRepository {
 
-    private final List<MonthDay> dates = new ArrayList<>();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
-
+    private final List<LocalDate> dates = new ArrayList<>();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
 
     public DateRepository() {
         try {
@@ -39,7 +39,7 @@ public class DateRepository {
                 .forEach(this::addDates);
     }
 
-    private MonthDay safeValidateDate(String line) {
+    private LocalDate safeValidateDate(String line) {
         try {
             return DateValidator.validateDate(line);
         } catch (Exception e) {
@@ -52,36 +52,36 @@ public class DateRepository {
      * 배열의 맨 마지막 원소가 현재 행(monthDay)보다 과거여야만 monthDay를 dates 배열에 추가한다.
      * 이에 부합하지 않는 경우 현재 행을 무시한다.
      */
-    private void addDates(MonthDay monthDay) {
+    private void addDates(LocalDate localDate) {
         if (dates.isEmpty()) {
-            dates.add(monthDay);
-        } else if (dates.get(dates.size() - 1).isBefore(monthDay)) {
-            dates.add(monthDay);
+            dates.add(localDate);
+        } else if (dates.get(dates.size() - 1).isBefore(localDate)) {
+            dates.add(localDate);
         }
     }
 
-    public void isAfterLastDate(MonthDay nowDate) {
+    public void isAfterLastDate(LocalDate nowDate) {
         if (dates.isEmpty()) {
             return;      // date.txt 파일이 비어있는 경우 모든 날짜가 가능하도록 처리
         }
-        MonthDay lastDate = dates.get(dates.size() - 1);
+        LocalDate lastDate = dates.get(dates.size() - 1);
         if (!lastDate.isBefore(nowDate)) {
             throw new IllegalArgumentException("[ERROR] " + lastDate.format(formatter) + " 보다 이후의 날짜여야 합니다. 현재 날짜를 다시 입력해주세요.");
         }
     }
 
-    public void save(MonthDay now) throws IOException {
+    public void save(LocalDate now) throws IOException {
         Path path = Paths.get(DATE_FILE_PATH);
         dates.add(now);
         List<String> rawDates = new ArrayList<>();
-        for(MonthDay date:dates){
+        for(LocalDate date:dates){
             String str = date.format(formatter);
             rawDates.add(str);
         }
         Files.write(path,rawDates);
     }
 
-    public MonthDay getNow() {
+    public LocalDate getNow() {
         return dates.get(dates.size() - 1);
     }
 }

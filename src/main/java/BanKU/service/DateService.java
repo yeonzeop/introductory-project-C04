@@ -4,6 +4,7 @@ import BanKU.repository.DateRepository;
 import BanKU.view.InputView;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.Scanner;
 
@@ -16,10 +17,10 @@ public class DateService {
         this.dateRepository = dateRepository;
     }
 
-    public MonthDay getNowDate(Scanner scanner) {
+    public LocalDate getNowDate(Scanner scanner) {
         while (true) {
             try {
-                MonthDay nowDate = validateDate(InputView.requestNowDate(scanner));
+                LocalDate nowDate = validateDate(InputView.requestNowDate(scanner));
                 dateRepository.isAfterLastDate(nowDate);
                 dateRepository.save(nowDate);
                 return nowDate;

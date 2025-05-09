@@ -12,6 +12,7 @@ import BanKU.service.DateService;
 import BanKU.service.MemberService;
 import BanKU.view.OutputView;
 
+import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.Objects;
 import java.util.Scanner;
@@ -34,7 +35,7 @@ public class BanKUController {
         System.out.println("====================================== BanKU ======================================");
         System.out.println("    Welcome! Start a better financial life with BanKU.");
         System.out.println("----------------------------------------------------------------------------------\n");
-        MonthDay nowDate = dateService.getNowDate(scanner);
+        LocalDate nowDate = dateService.getNowDate(scanner);
         accountService.setNow(nowDate);
 
         // 2. 로그인/회원가입 기능

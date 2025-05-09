@@ -3,6 +3,7 @@ package BanKU.domain;
 
 import BanKU.enums.TransactionType;
 
+import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 
@@ -12,13 +13,13 @@ import static BanKU.utils.TransactionValidator.*;
 
 public class Transaction {
     private final String senderAccountNumber;
-    private final MonthDay date;                      // 거래일시
+    private final LocalDate date;                      // 거래일시
     private final TransactionType type;
     private final String receiverAccountNumber;
     private final long amount;
     private final String memo;
 
-    public Transaction(String senderAccountNumber, MonthDay date, TransactionType type, String receiverAccountNumber, long amount, String memo) {
+    public Transaction(String senderAccountNumber, LocalDate date, TransactionType type, String receiverAccountNumber, long amount, String memo) {
         this.senderAccountNumber = senderAccountNumber;
         this.date = date;
         this.type = type;
@@ -33,7 +34,7 @@ public class Transaction {
             throw new IllegalArgumentException("[ERROR] 유효하지 않은 거래내역 데이터입니다. 해당 행을 무시합니다.");
         }
         String senderAccountNumber = validateAccountNumber(transactionInfos[0]);
-        MonthDay date = validateDate(transactionInfos[1]);
+        LocalDate date = validateDate(transactionInfos[1]);
         TransactionType type = TransactionType.from(transactionInfos[2]);
         String receiverAccountNumber = validateAccountNumber(transactionInfos[3]);
         long amount = validateAmount(transactionInfos[4]);
@@ -57,7 +58,7 @@ public class Transaction {
         return senderAccountNumber;
     }
 
-    public MonthDay getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -75,7 +76,7 @@ public class Transaction {
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         return "Transaction{" +
                 "senderAccountNumber='" + senderAccountNumber + '\'' +
                 ", date=" + date.format(formatter) +
