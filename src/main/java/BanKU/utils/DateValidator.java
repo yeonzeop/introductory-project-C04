@@ -17,12 +17,12 @@ public class DateValidator {
         if (!date.matches("\\d{6}")) {
             throw new IllegalArgumentException("[ERROR] 올바른 날짜 형식으로 입력해주세요.");
         }
-        int year = Integer.parseInt(date.substring(0,2));
+        int year = Integer.parseInt(date.substring(0,2)) + 2000;
         int month = Integer.parseInt(date.substring(2, 4));
         int day = Integer.parseInt(date.substring(4, 6));
         try {
             LocalDate localDate = LocalDate.of(year,month, day);
-            if(localDate.get(ChronoField.YEAR)<=24){
+            if(localDate.get(ChronoField.YEAR)<=2024){
                 throw new IllegalArgumentException("[ERROR] 2025년 이전 연도는 서비스 대상이 아닙니다.");
             }
             return localDate;
