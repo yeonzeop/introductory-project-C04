@@ -11,6 +11,7 @@ import BanKU.view.InputView;
 import BanKU.view.OutputView;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.MonthDay;
 import java.util.List;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ import static BanKU.utils.TransactionValidator.AMOUNT_LIMIT;
 import static BanKU.utils.TransactionValidator.validateAccountNumber;
 
 public class AccountService {
-    private MonthDay now;
+    private LocalDate now;
     private final MemberRepository memberRepository;
     private final TransactionRepository transactionRepository;
 
@@ -236,7 +237,7 @@ public class AccountService {
         }
     }
 
-    public void setNow(MonthDay now) {
+    public void setNow(LocalDate now) {
         this.now = now;
     }
 

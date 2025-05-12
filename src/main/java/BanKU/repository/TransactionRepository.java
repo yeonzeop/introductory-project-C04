@@ -81,7 +81,7 @@ public class TransactionRepository {
 
     public void save(Transaction transaction) throws IOException {
         Path path = Paths.get(TRANSACTION_FILE_PATH);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         String str = getString(transaction, formatter);
         validLines.add(str);
         Files.write(path, validLines);

@@ -89,7 +89,7 @@ public class MemberService {
         }
     }
 
-    public void createAccount(MonthDay nowDate, Member member, Scanner scanner) {
+    public void createAccount(LocalDate nowDate, Member member, Scanner scanner) {
         System.out.println("BanKU: ---------------------------------------------------------------------------\n" +
                 "                                     계 좌        생 성                             \n" +
                 "       ----------------------------------------------------------------------------");
@@ -125,14 +125,14 @@ public class MemberService {
                 "\nBanKU: 계좌 생성이 완료되었습니다.");
     }
 
-    private String generateUniqueAccountNumber(MonthDay nowDate) {
+    private String generateUniqueAccountNumber(LocalDate nowDate) {
         SecureRandom random = new SecureRandom();
         while (true) {
             StringBuilder sb = new StringBuilder();
             while (sb.length() < 8) {
                 sb.append(random.nextInt(10));      // 0~9 중 하나 추가
             }
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd"); // 흠 이건 어카지...
             String accountNumber = nowDate.format(formatter) + sb.toString();
             if (memberRepository.isPresentAccount(accountNumber)) {
                 continue;
