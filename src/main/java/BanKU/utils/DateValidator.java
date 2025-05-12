@@ -22,7 +22,7 @@ public class DateValidator {
         int day = Integer.parseInt(date.substring(4, 6));
         try {
             LocalDate localDate = LocalDate.of(year,month, day);
-            if(localDate.get(ChronoField.YEAR)<=2024){
+            if(localDate.get(ChronoField.YEAR)<=24){
                 throw new IllegalArgumentException("[ERROR] 2025년 이전 연도는 서비스 대상이 아닙니다.");
             }
             return localDate;
