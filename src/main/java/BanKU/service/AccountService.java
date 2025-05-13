@@ -6,6 +6,7 @@ import BanKU.domain.Member;
 import BanKU.domain.Transaction;
 import BanKU.enums.TransactionType;
 import BanKU.repository.MemberRepository;
+import BanKU.repository.ReservationRepository;
 import BanKU.repository.TransactionRepository;
 import BanKU.view.InputView;
 import BanKU.view.OutputView;
@@ -24,10 +25,12 @@ public class AccountService {
     private LocalDate now;
     private final MemberRepository memberRepository;
     private final TransactionRepository transactionRepository;
+    private final ReservationRepository reservationRepository;
 
-    public AccountService(MemberRepository memberRepository, TransactionRepository transactionRepository) {
+    public AccountService(MemberRepository memberRepository, TransactionRepository transactionRepository, ReservationRepository reservationRepository) {
         this.memberRepository = memberRepository;
         this.transactionRepository = transactionRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     public Account choose(Member member, Scanner scanner) {
@@ -238,7 +241,13 @@ public class AccountService {
     }
 
     public void setNow(LocalDate now) {
-        this.now = now;
+        try {
+            this.now = now;
+            reservationRepository.reservedTransfer(now);
+        } catch (IOException e) {
+            System.out.println("[ERROR] reservation.txt 파일에 저장할 수 없습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        }
     }
 
 }

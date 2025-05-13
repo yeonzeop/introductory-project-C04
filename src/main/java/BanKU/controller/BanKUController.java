@@ -6,6 +6,7 @@ import BanKU.domain.Member;
 import BanKU.enums.Menu;
 import BanKU.repository.DateRepository;
 import BanKU.repository.MemberRepository;
+import BanKU.repository.ReservationRepository;
 import BanKU.repository.TransactionRepository;
 import BanKU.service.AccountService;
 import BanKU.service.DateService;
@@ -23,9 +24,9 @@ public class BanKUController {
     private final AccountService accountService;
     private final MemberService memberService;
 
-    public BanKUController(DateRepository dateRepository, MemberRepository memberRepository, TransactionRepository transactionRepository) {
+    public BanKUController(DateRepository dateRepository, MemberRepository memberRepository, TransactionRepository transactionRepository,ReservationRepository reservationRepository) {
         this.dateService = new DateService(dateRepository);
-        this.accountService = new AccountService(memberRepository, transactionRepository);
+        this.accountService = new AccountService(memberRepository, transactionRepository,reservationRepository);
         this.memberService = new MemberService(memberRepository);
     }
 
@@ -37,6 +38,7 @@ public class BanKUController {
         System.out.println("----------------------------------------------------------------------------------\n");
         LocalDate nowDate = dateService.getNowDate(scanner);
         accountService.setNow(nowDate);
+
 
         // 2. 로그인/회원가입 기능
         Member member = memberService.handleLoginOrSignup(scanner);
