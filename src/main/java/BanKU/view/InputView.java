@@ -34,7 +34,7 @@ public class InputView {
 
     public static String requestNowDate(Scanner scanner) {
         System.out.print("BanKU: 날짜를 입력해주세요\n" +
-                "(MMDD 형식, 예: 0912) > ");
+                "(MMDD 형식, 예: 250912) > ");
         return scanner.nextLine();
     }
 

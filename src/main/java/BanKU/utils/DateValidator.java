@@ -24,6 +24,8 @@ public class DateValidator {
             LocalDate localDate = LocalDate.of(year,month, day);
             if(localDate.get(ChronoField.YEAR)<=2024){
                 throw new IllegalArgumentException("[ERROR] 2025년 이전 연도는 서비스 대상이 아닙니다.");
+            }else if(localDate.get(ChronoField.YEAR)>=2051){
+                throw new IllegalArgumentException("[ERROR] 2050년 이후 연도는 서비스 대상이 아닙니다.");
             }
             return localDate;
         } catch (DateTimeException e) {
