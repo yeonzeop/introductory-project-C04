@@ -12,16 +12,16 @@ public class Reservation {
     private final long amount;
     private final String memo;
 
-    public LocalDate getTransferDate() {
-        return transferDate;
-    }
-
     public Reservation(String senderAccountNumber, LocalDate date, String receiverAccountNumber, long amount, String memo) {
         this.senderAccountNumber = senderAccountNumber;
         this.transferDate = date;
         this.receiverAccountNumber = receiverAccountNumber;
         this.amount = amount;
         this.memo = memo;
+    }
+
+    public LocalDate getTransferDate() {
+        return transferDate;
     }
 
     public String getSenderAccountNumber() {

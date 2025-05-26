@@ -54,25 +54,29 @@ public class ReservationRepository {
         validLines.clear();
         Path path = Paths.get(RESERVATION_FILE_PATH);
         for(Reservation reservation:reservations){
-            if(!reservation.getTransferDate().isAfter(now)){
-                Transaction reservedDeposit = new Transaction(reservation.getReceiverAccountNumber(),
-                        reservation.getTransferDate(),
-                        TransactionType.DEPOSIT, reservation.getSenderAccountNumber(),
-                        reservation.getAmount(), reservation.getMemo());
-                Transaction reservedWithdrawal = new Transaction(reservation.getSenderAccountNumber(),
-                        reservation.getTransferDate(),
-                        TransactionType.WITHDRAWAL, reservation.getReceiverAccountNumber(),
-                        reservation.getAmount(), reservation.getMemo());
-                reservedDeposit.applyToAccounts(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()));
-                reservedWithdrawal.applyToAccounts(memberRepository.findAccountByNumber(reservation.getSenderAccountNumber()));
-                transactionRepository.save(reservedDeposit);
-                transactionRepository.save(reservedWithdrawal);
-            }else{
-                String str = getLine(reservation);
-                validLines.add(str);
+            try {
+                if (!reservation.getTransferDate().isAfter(now)) {
+                    Transaction reservedDeposit = new Transaction(reservation.getReceiverAccountNumber(),
+                            reservation.getTransferDate(),
+                            TransactionType.DEPOSIT, reservation.getSenderAccountNumber(),
+                            reservation.getAmount(), reservation.getMemo());
+                    Transaction reservedWithdrawal = new Transaction(reservation.getSenderAccountNumber(),
+                            reservation.getTransferDate(),
+                            TransactionType.WITHDRAWAL, reservation.getReceiverAccountNumber(),
+                            reservation.getAmount(), reservation.getMemo());
+                    reservedDeposit.applyToAccounts(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()));
+                    reservedWithdrawal.applyToAccounts(memberRepository.findAccountByNumber(reservation.getSenderAccountNumber()));
+                    transactionRepository.save(reservedDeposit);
+                    transactionRepository.save(reservedWithdrawal);
+                } else {
+                    String str = getLine(reservation);
+                    validLines.add(str);
+                }
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
             }
-            Files.write(path,validLines);
         }
+        Files.write(path,validLines);
     }
 
     public String getLine(Reservation reservation){
