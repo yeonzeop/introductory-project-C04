@@ -65,7 +65,7 @@ public class BanKUController {
                     System.out.println("BanKU: -----------------------------------------------------------------------------------\n" +
                             "                                          계 좌     조 회                                   \n" +
                             "       -----------------------------------------------------------------------------------");
-                    OutputView.showAccounts(member.getAccounts());
+                    OutputView.showAccounts(member.getRegularAccounts());
                     System.out.print("BanKU: 메뉴로 돌아가시려면 'y' 혹은 'Y'키를 입력해주세요> ");
                     while (true) {
 //                        System.out.print("BanKU: 메뉴로 돌아가시려면 'y' 혹은 'Y'키를 입력해주세요> ");

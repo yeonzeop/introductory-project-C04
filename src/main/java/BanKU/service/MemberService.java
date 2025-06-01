@@ -214,7 +214,6 @@ public class MemberService {
         List<Transaction> transactions = transactionRepository.findTransactionByAccount(savingAccount);
         long totalAmount = savingAccount.computeInterest(transactions);
 
-
         List<Account> regularAccounts = member.getAccounts().stream()
                 .filter(account -> !(account instanceof SavingAccount) &&
                         account.isActive() &&

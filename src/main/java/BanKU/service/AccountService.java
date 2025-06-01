@@ -3,6 +3,7 @@ package BanKU.service;
 
 import BanKU.domain.Account;
 import BanKU.domain.Member;
+import BanKU.domain.SavingAccount;
 import BanKU.domain.Transaction;
 import BanKU.enums.TransactionType;
 import BanKU.repository.MemberRepository;
@@ -32,10 +33,10 @@ public class AccountService {
     }
 
     public Account choose(Member member, Scanner scanner) {
-        List<Account> accounts = member.getAccounts();
+        List<Account> regularAccounts = member.getRegularAccounts();
         System.out.println("[" + member.getName() + "]님의 사용가능한 계좌 목록");
-        OutputView.showAccounts(accounts);
-        return InputView.chooseAccount(accounts, scanner);
+        OutputView.showAccounts(regularAccounts);
+        return InputView.chooseAccount(regularAccounts, scanner);
     }
 
     public void deposit(Account account, Scanner scanner) {

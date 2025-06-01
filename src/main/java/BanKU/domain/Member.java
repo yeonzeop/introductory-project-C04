@@ -102,4 +102,10 @@ public class Member {
     public void setHasSavingAccount(boolean hasSavingAccount) {
         this.hasSavingAccount = hasSavingAccount;
     }
+
+    public List<Account> getRegularAccounts() {
+        return accounts.stream()
+                .filter(account -> !(account instanceof SavingAccount) && account.isActive())
+                .toList();
+    }
 }
