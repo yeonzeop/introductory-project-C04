@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +55,7 @@ public class MemberRepository {
                 .filter(line -> !line.isEmpty())
                 .map(line -> line.split("\\|"))
                 .map(strings -> Map.entry(strings[0], SavingAccount.from(strings)))
-                .filter(entry -> entry.getValue() != null)
+                .filter(entry -> entry.getValue() != null && !entry.getValue().isClosed())
                 .forEach(entry -> {
                     try {
                         Member member = findMemberByLoginId(entry.getKey().trim());
@@ -189,13 +190,29 @@ public class MemberRepository {
                     .append(savingAccount.getPassword()).append("|")
                     .append(savingAccount.getStartDay().format(formatter)).append("|")
                     .append(savingAccount.getEndDay().format(formatter)).append("|")
-                    .append(savingAccount.isClosed());
+                    .append(savingAccount.isClosed() ? "closed" : "opened");
 //            System.out.println("[LOG] 적금계좌 저장 형태 = " + sb.toString());
             writer.write(sb.toString());
             writer.newLine();
         } catch (IOException e) {
             System.out.println("[ERROR] 적금 계좌 정보를 파일에 저장하는 데 실패했습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        }
+    }
+
+    public void setSavingsAccountClosed(Member member, SavingAccount account) {
+        Path path = Paths.get(DEPOSIT_INFO_FILE_PATH);
+
+        try {
+            List<String> lines = Files.readAllLines(path);
+            List<String> updatedLines = lines.stream()
+                    .filter(line -> !line.contains(account.getAccountNumber()))
+                    .toList();
+            Files.write(path, updatedLines);
+            saveSavingsAccount(member, account);
+
+        } catch (IOException e) {
+            System.out.println("[ERROR] 적금 계좌 정보를 파일을 변경하는 데 실패했습니다.");
         }
     }
 }

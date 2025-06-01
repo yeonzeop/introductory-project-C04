@@ -167,7 +167,7 @@ public class AccountService {
             boolean isFirstPrint = true;
             Account receiverAccount = getReceiverAccount(senderAccount, scanner, isFirstPrint);
             long amount = getAmount(senderAccount, scanner, TRANSFER);
-            if (receiverAccount.getBalance() > Long.MAX_VALUE - amount) {
+            if (!receiverAccount.canAcceptAmount(amount)) {
                 System.out.println("BanKU: 계좌 잔액 문제가 발생하여 해당 계좌를 비활성화 합니다. [비활성 계좌: " + receiverAccount.getAccountNumber() + "]");
                 receiverAccount.deactivate();
                 return;
@@ -194,8 +194,12 @@ public class AccountService {
             if (!(applyReceive && applySend)) {
                 return;
             }
-            transactionRepository.save(receiveTransaction);
             transactionRepository.save(sendTransaction);
+            if (receiverAccount instanceof SavingAccount) {
+                transactionRepository.saveDeposit(receiveTransaction);
+            } else {
+                transactionRepository.save(receiveTransaction);
+            }
 
             System.out.println("BanKU: 송금이 완료되었습니다.\n" +
                     "       송금한 계좌(사용자 계좌): " + senderAccount.getAccountNumber() + " 잔액(단위: 원): " + senderAccount.getBalance() + "원");

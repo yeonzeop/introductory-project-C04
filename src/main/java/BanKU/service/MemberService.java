@@ -152,6 +152,7 @@ public class MemberService {
         String password = generatePassword(scanner);
         SavingAccount savingAccount = new SavingAccount(accountNumber, password, nowDate, type, false);
         member.addAccount(savingAccount);
+        member.setHasSavingAccount(true);
         memberRepository.saveSavingsAccount(member, savingAccount);
         System.out.println("BanKU: 적금 계좌번호: " + accountNumber + "\nBanKU: 적금 계좌 생성이 완료되었습니다.");
     }
@@ -169,28 +170,6 @@ public class MemberService {
             System.out.println("[ERROR] 올바르지 않은 입력입니다. 위 규칙에 알맞은 비밀번호를 입력해주세요");
         }
         return password;
-    }
-
-    private SavingsType selectDepositProduct(Scanner scanner) {
-        System.out.println("적금 상품을 선택해주세요.");
-        System.out.println("1. 단기 (이율 2.0%, 중도해지 이율 0.1%)");
-        System.out.println("2. 중기 (이율 3.0%, 중도해지 이율 0.5%)");
-        System.out.println("3. 장기 (이율 4.0%, 중도해지 이율 1.0%)");
-
-        while (true) {
-            System.out.print("상품 번호 (1~3) > ");
-            String input = scanner.nextLine().trim();
-            switch (input) {
-                case "1":
-                    return SavingsType.SHORT;
-                case "2":
-                    return SavingsType.MID;
-                case "3":
-                    return SavingsType.LONG;
-                default:
-                    System.out.println("[ERROR] 잘못된 입력입니다. 1~3 사이의 숫자를 입력해주세요. > ");
-            }
-        }
     }
 
     public void closeDepositAccount(LocalDate nowDate, Member member, Scanner scanner) {
@@ -225,6 +204,7 @@ public class MemberService {
             savingAccount.deactivate();
             savingAccount.setClosed();
             member.setHasSavingAccount(false);
+            memberRepository.setSavingsAccountClosed(member, savingAccount);
             System.out.println("입금 가능한 계좌가 없어 적금 계좌가 동결되었습니다.");
             return;
         }
@@ -253,6 +233,29 @@ public class MemberService {
         savingAccount.setClosed();
         member.setHasSavingAccount(false);
     }
+
+    private SavingsType selectDepositProduct(Scanner scanner) {
+        System.out.println("적금 상품을 선택해주세요.");
+        System.out.println("1. 단기 (이율 2.0%, 중도해지 이율 0.1%)");
+        System.out.println("2. 중기 (이율 3.0%, 중도해지 이율 0.5%)");
+        System.out.println("3. 장기 (이율 4.0%, 중도해지 이율 1.0%)");
+
+        while (true) {
+            System.out.print("상품 번호 (1~3) > ");
+            String input = scanner.nextLine().trim();
+            switch (input) {
+                case "1":
+                    return SavingsType.SHORT;
+                case "2":
+                    return SavingsType.MID;
+                case "3":
+                    return SavingsType.LONG;
+                default:
+                    System.out.println("[ERROR] 잘못된 입력입니다. 1~3 사이의 숫자를 입력해주세요. > ");
+            }
+        }
+    }
+
 
     private Account chooseReceivingAccount(Scanner scanner, List<Account> regularAccounts) {
         System.out.println("적금 잔액을 입금할 계좌의 계좌번호를 입력해주세요:");
