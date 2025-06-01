@@ -9,7 +9,9 @@ public enum Menu {
     TRANSFER("송금", 3),
     ACCOUNT_INQUIRY("계좌 조회", 4),
     ACCOUNT_CREATION("계좌 생성", 5),
-    QUIT("종료", 6);
+    SAVING_ACCOUNT_CREATION("적금 계좌 가입", 6),
+    SAVING_ACCOUNT_CLOSED("적금 계좌 해지", 7),
+    QUIT("종료", 8);
 
     private final String description;
     private final int menuNumber;

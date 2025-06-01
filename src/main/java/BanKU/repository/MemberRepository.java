@@ -3,7 +3,10 @@ package BanKU.repository;
 
 import BanKU.domain.Account;
 import BanKU.domain.Member;
+import BanKU.domain.SavingAccount;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,16 +17,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static BanKU.Main.DEPOSIT_INFO_FILE_PATH;
 import static BanKU.Main.USER_FILE_PATH;
 
 public class MemberRepository {
     private final Map<String, Member> membersByLoginId = new HashMap<>();           // loginId - Member
     private final Map<String, Member> membersByPhoneNumber = new HashMap<>();       // phoneNumber - Member
     private final Map<String, Account> accounts = new HashMap<>();      // 계좌번호 - Account
+    private final Map<String, Account> savingsAccounts = new HashMap<>();      // 계좌번호 - Account
+
 
     public MemberRepository() {
         try {
             loadUserFile();
+            loadSavingsFile();
         } catch (IOException e) {
             System.out.println("[ERROR] user.txt 파일을 읽어올 수 없습니다. 프로그램을 종료합니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
@@ -39,6 +46,17 @@ public class MemberRepository {
                 .forEach(member -> {
                     addMember(member);
                     addAccount(member.getAccounts());
+                });
+    }
+
+    private void loadSavingsFile() throws IOException {
+        Path path = Paths.get(DEPOSIT_INFO_FILE_PATH);
+        Files.lines(path)
+                .map(line -> line.split("\\|"))
+                .map(SavingAccount::from)
+                .filter(Objects::nonNull)
+                .forEach(savingAccount -> {
+                    savingsAccounts.put(savingAccount.getAccountNumber(), savingAccount);
                 });
     }
 
@@ -89,9 +107,7 @@ public class MemberRepository {
 
 
     public void saveAccount(Member member, Account account) {
-        // TODO. 파일에서 member에 해당하는 행 찾아서 account 추가하기
         Path path = Paths.get(USER_FILE_PATH);
-
         try {
             List<String> lines = Files.readAllLines(path);
 
@@ -123,12 +139,6 @@ public class MemberRepository {
 
     public boolean isPresentAccount(String accountNumber) {
         return accounts.containsKey(accountNumber);
-//        if (!accounts.containsKey(accountNumber)) {
-//            throw new IllegalArgumentException("[ERROR] 존재하지 않는 계좌입니다.");
-//        }
-//        if (!accounts.get(accountNumber).isActive()) {
-//            throw new IllegalArgumentException("[ERROR] 비활성화 된 계좌입니다.");
-//        }
     }
 
     public Account findAccountByNumber(String accountNumber) {
@@ -158,5 +168,24 @@ public class MemberRepository {
             System.out.println(account.toString());
         }
         System.out.println();
+    }
+
+    public void saveSavingsAccount(Member member, SavingAccount savingAccount) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEPOSIT_INFO_FILE_PATH, true))) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(member.getLoginId().toLowerCase()).append("|")
+                    .append(savingAccount.getAccountNumber()).append("|")
+                    .append(savingAccount.getPassword()).append("|")
+                    .append(savingAccount.getStartDay().format(formatter)).append("|")
+                    .append(savingAccount.getEndDay().format(formatter)).append("|")
+                    .append(savingAccount.isClosed());
+//            System.out.println("[LOG] 적금계좌 저장 형태 = " + sb.toString());
+            writer.write(sb.toString());
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("[ERROR] 적금 계좌 정보를 파일에 저장하는 데 실패했습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        }
     }
 }

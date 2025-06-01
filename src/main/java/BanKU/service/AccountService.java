@@ -13,13 +13,11 @@ import BanKU.view.OutputView;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.MonthDay;
 import java.util.List;
 import java.util.Scanner;
 
 import static BanKU.enums.TransactionType.*;
 import static BanKU.utils.TransactionValidator.AMOUNT_LIMIT;
-import static BanKU.utils.TransactionValidator.validateAccountNumber;
 
 public class AccountService {
     private LocalDate now;
@@ -45,8 +43,8 @@ public class AccountService {
             System.out.println("[ERROR] 비활성화된 계좌에 입금할 수 없습니다.");
             return;
         }
+        long amount = getAmount(account, scanner, DEPOSIT);
         try {
-            long amount = getAmount(account, scanner, DEPOSIT);
             Transaction transaction = new Transaction(
                     account.getAccountNumber(),
                     now,
@@ -54,15 +52,13 @@ public class AccountService {
                     account.getAccountNumber(),
                     amount,
                     "");
-            if (account.getBalance() > Long.MAX_VALUE - amount) {
+            if (!account.canAcceptAmount(amount)) {
                 System.out.println("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
                 account.deactivate();
                 return;
             }
             checkAccountPassword(account, scanner);
-            if (!applyTransactionToAccount(account, transaction)) {
-                return;
-            }
+            applyTransactionToAccount(account, transaction);
             transactionRepository.save(transaction);
             System.out.println("BanKU: 입금이 완료되었습니다.\n" +
                     "       입금한 계좌(사용자 계좌): " + account.getAccountNumber() + " 잔액(단위: 원): " + account.getBalance() + "원");

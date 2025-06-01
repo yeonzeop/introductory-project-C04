@@ -27,7 +27,7 @@ public class BanKUController {
     public BanKUController(DateRepository dateRepository, MemberRepository memberRepository, TransactionRepository transactionRepository,ReservationRepository reservationRepository) {
         this.dateService = new DateService(dateRepository);
         this.accountService = new AccountService(memberRepository, transactionRepository,reservationRepository);
-        this.memberService = new MemberService(memberRepository);
+        this.memberService = new MemberService(memberRepository, transactionRepository);
     }
 
     public void run() {
@@ -71,12 +71,14 @@ public class BanKUController {
 //                        System.out.print("BanKU: 메뉴로 돌아가시려면 'y' 혹은 'Y'키를 입력해주세요> ");
                         if (scanner.nextLine().trim().equalsIgnoreCase("y")) {
                             break;
-                        }else{
-                            System.out.print("[ERROR] 잘못된 입력입니다. 문자 'y' 혹은 'Y'를 입력해주세요>");
+                        } else {
+                            System.out.print("[ERROR] 잘못된 입력입니다. 문자 'y' 혹은 'Y'를 입력해주세요> ");
                         }
                     }
                 }
                 case ACCOUNT_CREATION -> memberService.createAccount(nowDate, member, scanner);
+                case SAVING_ACCOUNT_CREATION -> memberService.createDepositAccount(nowDate, member, scanner);
+                case SAVING_ACCOUNT_CLOSED -> memberService.closeDepositAccount(nowDate, member, scanner);
                 case QUIT -> {
                     if (quit(scanner)) {
                         return;
