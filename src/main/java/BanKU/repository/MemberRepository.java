@@ -24,8 +24,6 @@ public class MemberRepository {
     private final Map<String, Member> membersByLoginId = new HashMap<>();           // loginId - Member
     private final Map<String, Member> membersByPhoneNumber = new HashMap<>();       // phoneNumber - Member
     private final Map<String, Account> accounts = new HashMap<>();      // 계좌번호 - Account
-    private final Map<String, Account> savingsAccounts = new HashMap<>();      // 계좌번호 - Account
-
 
     public MemberRepository() {
         try {
@@ -52,13 +50,24 @@ public class MemberRepository {
     private void loadSavingsFile() throws IOException {
         Path path = Paths.get(DEPOSIT_INFO_FILE_PATH);
         Files.lines(path)
+                .map(String::trim)
+                .filter(line -> !line.isEmpty())
                 .map(line -> line.split("\\|"))
-                .map(SavingAccount::from)
-                .filter(Objects::nonNull)
-                .forEach(savingAccount -> {
-                    savingsAccounts.put(savingAccount.getAccountNumber(), savingAccount);
+                .map(strings -> Map.entry(strings[0], SavingAccount.from(strings)))
+                .filter(entry -> entry.getValue() != null)
+                .forEach(entry -> {
+                    try {
+                        Member member = findMemberByLoginId(entry.getKey().trim());
+                        member.setHasSavingAccount(true);
+                        SavingAccount savingAccount = entry.getValue();
+                        accounts.put(savingAccount.getAccountNumber(), savingAccount);
+                        member.addAccount(savingAccount);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
                 });
     }
+
 
     private void addMember(Member member) {
         boolean alreadyExistLoginId = membersByLoginId.containsKey(member.getLoginId());
@@ -150,10 +159,11 @@ public class MemberRepository {
     }
 
     public Member findMemberByLoginId(String loginId) {
-        if (membersByLoginId.containsKey(loginId)){
-            return membersByLoginId.get(loginId);
-        }
-        throw new IllegalArgumentException("[ERROR] 등록되지 않은 아이디입니다.");
+        return membersByLoginId.entrySet().stream()
+                .filter(entry -> entry.getKey().equalsIgnoreCase(loginId))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 등록되지 않은 아이디입니다."));
     }
 
     public boolean isExistingLoginId(String loginId) {

@@ -75,7 +75,7 @@ public class SavingAccount extends Account {
             return null;
         }
         try {
-            String loginId = validateLoginId(strings[0]);
+            validateLoginId(strings[0]);
             Account account = validateAccount(strings[1] + "&" + strings[2]);
             LocalDate startDay = validateDate(strings[3]);
             LocalDate endDay = validateDate(strings[4]);
@@ -83,7 +83,6 @@ public class SavingAccount extends Account {
             SavingsType type = determineSavingsType(startDay, endDay);
 
             boolean isClosed = !strings[5].equalsIgnoreCase("opened");
-
             return new SavingAccount(account.getAccountNumber(),
                     account.getPassword(),
                     startDay,

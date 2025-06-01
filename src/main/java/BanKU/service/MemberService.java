@@ -17,8 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
 
-import static BanKU.Main.DEPOSIT_INFO_FILE_PATH;
-import static BanKU.Main.USER_FILE_PATH;
 import static BanKU.enums.TransactionType.DEPOSIT;
 
 public class MemberService {
@@ -144,16 +142,12 @@ public class MemberService {
     }
 
     public void createDepositAccount(LocalDate nowDate, Member member, Scanner scanner) {
-        List<Account> accounts = member.getAccounts();
-        boolean hasSavingAccount = accounts.stream()
-                .anyMatch(account -> account instanceof SavingAccount);
-        if (hasSavingAccount) {
+        if (member.hasSavingAccount()) {
             System.out.println("이미 적금 계좌가 존재합니다. 한 개의 적금 계좌만 만들 수 있습니다.");
             return;
         }
 
         SavingsType type = selectDepositProduct(scanner);
-
         String accountNumber = generateUniqueAccountNumber(nowDate);
         String password = generatePassword(scanner);
         SavingAccount savingAccount = new SavingAccount(accountNumber, password, nowDate, type, false);
@@ -194,30 +188,23 @@ public class MemberService {
                 case "3":
                     return SavingsType.LONG;
                 default:
-                    System.out.println("[ERROR] 잘못된 입력입니다. 1~3 사이의 숫자를 입력해주세요.");
+                    System.out.println("[ERROR] 잘못된 입력입니다. 1~3 사이의 숫자를 입력해주세요. > ");
             }
         }
     }
 
-    private int getDepositPeriodInMonths(double rate) {
-        if (rate == 0.02) return 6;
-        if (rate == 0.03) return 12;
-        return 18;
-    }
-
     public void closeDepositAccount(LocalDate nowDate, Member member, Scanner scanner) {
-        // TODO. 적금 계좌를 해지(비활성화)
-        SavingAccount savingAccount = member.getAccounts().stream()
-                .filter(account -> account instanceof SavingAccount && account.isActive())
-                .map(account -> (SavingAccount) account)
-                .findFirst()
-                .orElse(null);
-        if (savingAccount == null) {
+        if (!member.hasSavingAccount()) {
             System.out.println("해지 가능한 적금 계좌가 없습니다.");
             return;
         }
+        SavingAccount savingAccount = member.getAccounts().stream()
+                .filter(account -> account.isActive() && account instanceof SavingAccount )
+                .map(account -> (SavingAccount) account)
+                .findFirst()
+                .orElse(null);
 
-        System.out.println("적금 계좌를 해지하시겠습니까? (y 입력 시 진행)");
+        System.out.print("적금 계좌를 해지하시겠습니까? (y 입력 시 진행) > ");
         String input = scanner.nextLine().trim();
         if (!input.equalsIgnoreCase("y")) {
             System.out.println("적금 해지를 취소하였습니다.");
@@ -238,12 +225,11 @@ public class MemberService {
         if (regularAccounts.isEmpty()) {
             savingAccount.deactivate();
             savingAccount.setClosed();
+            member.setHasSavingAccount(false);
             System.out.println("입금 가능한 계좌가 없어 적금 계좌가 동결되었습니다.");
             return;
         }
 
-        //6. 사용자에게 안내 메시지와 함께 일반 계좌의 계좌번호와 함께 번호를 출력 (ex. 1. 1번계좌의 계좌번호 \n 2. 2번계좌의 계좌번호)
-        // 7. 사용자가 적금계좌의 잔액을 송금할 계좌 선택
         Account receivingAccount = chooseReceivingAccount(scanner, regularAccounts);
         receivingAccount.plus(totalAmount);
         try {
@@ -266,6 +252,7 @@ public class MemberService {
 
         savingAccount.deactivate();
         savingAccount.setClosed();
+        member.setHasSavingAccount(false);
     }
 
     private Account chooseReceivingAccount(Scanner scanner, List<Account> regularAccounts) {
