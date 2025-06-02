@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -69,6 +70,10 @@ public class DateRepository {
         LocalDate lastDate = dates.get(dates.size() - 1);
         if (!lastDate.isBefore(nowDate)) {
             throw new IllegalArgumentException("[ERROR] " + lastDate.format(formatter) + " 보다 이후의 날짜여야 합니다. 현재 날짜를 다시 입력해주세요.");
+        }
+        long diffMonths = ChronoUnit.MONTHS.between(nowDate,dates.get(dates.size() - 1));
+        if( diffMonths > 0){
+            memberRepository.freeAccountInterest(diffMonths);
         }
     }
 
