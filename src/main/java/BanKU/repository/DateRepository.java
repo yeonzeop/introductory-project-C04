@@ -23,9 +23,11 @@ public class DateRepository {
     private final List<LocalDate> dates = new ArrayList<>();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
     private final MemberRepository memberRepository;
+    private final TransactionRepository transactionRepository;
 
-    public DateRepository(MemberRepository memberRepository) {
+    public DateRepository(MemberRepository memberRepository, TransactionRepository transactionRepository) {
         this.memberRepository = memberRepository;
+        this.transactionRepository = transactionRepository;
         try {
             loadDateFile();
         } catch (IOException | URISyntaxException e) {
