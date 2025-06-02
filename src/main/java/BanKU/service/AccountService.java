@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import static BanKU.enums.TransactionType.*;
+import static BanKU.utils.DateValidator.validateDate;
 import static BanKU.utils.TransactionValidator.AMOUNT_LIMIT;
 
 public class AccountService {
@@ -272,7 +273,21 @@ public class AccountService {
         }
     }
 
-    public LocalDate getTransferDate(Scanner scanner){return null;}
+    public LocalDate getTransferDate(Scanner scanner){
+        LocalDate transferDate;
+        while(true) {
+            try {
+                System.out.print("BanKU: 날짜를 입력해주세요 (YYMMDD 형식, 예: 251225) > ");
+                transferDate = validateDate(scanner.nextLine());
+                if(!transferDate.isAfter(now)){
+                    throw new IllegalArgumentException("[ERROR] 현재 시점 이후의 날짜만 입력 가능합니다.");
+                }
+                return transferDate;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 
 
 }
