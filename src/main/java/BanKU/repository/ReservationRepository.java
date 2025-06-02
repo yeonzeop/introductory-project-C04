@@ -91,4 +91,7 @@ public class ReservationRepository {
         }
         return str;
     }
+
+    public void save(Reservation reservation) throws IOException{
+    }
 }
