@@ -11,7 +11,8 @@ public enum Menu {
     ACCOUNT_CREATION("계좌 생성", 5),
     SAVING_ACCOUNT_CREATION("적금 계좌 가입", 6),
     SAVING_ACCOUNT_CLOSED("적금 계좌 해지", 7),
-    QUIT("종료", 8);
+    TRANSFER_RESERVATION("예약 송금", 8),
+    QUIT("종료", 9);
 
     private final String description;
     private final int menuNumber;
