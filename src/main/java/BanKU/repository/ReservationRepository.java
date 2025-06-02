@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static BanKU.Main.RESERVATION_FILE_PATH;
-import static BanKU.Main.TRANSACTION_FILE_PATH;
 
 public class ReservationRepository {
     private final TransactionRepository transactionRepository;
