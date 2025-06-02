@@ -220,7 +220,7 @@ public class MemberRepository {
         double interestRate = 0.1;
         for(Account account: accounts.values()){
             if(account.isActive()){
-                long interest = (long)Math.ceil(account.getBalance() * ( diffMonths * (interestRate / 12))); // 소수 첫째자리에서 올림
+                long interest = (long)Math.ceil(account.getBalance() * ( diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
                 account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
             }
         }
