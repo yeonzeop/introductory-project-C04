@@ -5,7 +5,6 @@ import BanKU.domain.Transaction;
 import BanKU.enums.TransactionType;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static BanKU.Main.RESERVATION_FILE_PATH;
-import static BanKU.Main.TRANSACTION_FILE_PATH;
 
 public class ReservationRepository {
     private final TransactionRepository transactionRepository;

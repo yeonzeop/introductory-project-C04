@@ -14,6 +14,7 @@ public class Member {
     private final LocalDate birthday;
     private String phoneNumber;
     private List<Account> accounts;
+    private boolean hasSavingAccount = false;
 
     public Member(String loginId, String password, String name, LocalDate birthday, String phoneNumber, List<Account> accounts) {
         this.loginId = loginId;
@@ -89,8 +90,22 @@ public class Member {
     }
 
     public void addAccount(Account account) {
-        if (accounts.size() <= 2) {
+        if (accounts.size() <= 3) {
             accounts.add(account);
         }
+    }
+
+    public boolean hasSavingAccount() {
+        return hasSavingAccount;
+    }
+
+    public void setHasSavingAccount(boolean hasSavingAccount) {
+        this.hasSavingAccount = hasSavingAccount;
+    }
+
+    public List<Account> getRegularAccounts() {
+        return accounts.stream()
+                .filter(account -> !(account instanceof SavingAccount) && account.isActive())
+                .toList();
     }
 }

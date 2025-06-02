@@ -2,15 +2,22 @@ package BanKU.service;
 
 import BanKU.domain.Account;
 import BanKU.domain.Member;
+import BanKU.domain.SavingAccount;
+import BanKU.domain.Transaction;
+import BanKU.enums.SavingsType;
 import BanKU.repository.MemberRepository;
+import BanKU.repository.TransactionRepository;
 import BanKU.view.InputView;
 import BanKU.view.OutputView;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
-import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Scanner;
+
+import static BanKU.enums.TransactionType.DEPOSIT;
 
 public class MemberService {
 
@@ -21,9 +28,12 @@ public class MemberService {
     private final static String LOGIN_PASSWORD = "BanKU: 비밀번호를 입력해주세요 > ";
 
     private final MemberRepository memberRepository;
+    private final TransactionRepository transactionRepository;
 
-    public MemberService(MemberRepository memberRepository) {
+
+    public MemberService(MemberRepository memberRepository, TransactionRepository transactionRepository) {
         this.memberRepository = memberRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     public Member handleLoginOrSignup(Scanner scanner) {
@@ -107,21 +117,11 @@ public class MemberService {
         }
 
         String accountNumber = generateUniqueAccountNumber(nowDate);
-        String password;
-        System.out.println("BanKU: 해당 계좌의 비밀번호(4자리 숫자)를 설정해주세요.\n" +
-                "-----------------------------------------------------------------------------------");
-        while (true) {
-            System.out.print("비밀번호 > ");
-            password = scanner.nextLine();
-            if (password.matches("\\d{4}")) {
-                break;
-            }
-            System.out.println("[ERROR] 올바르지 않은 입력입니다. 위 규칙에 알맞은 비밀번호를 입력해주세요");
-        }
+        String password = generatePassword(scanner);
         Account account = new Account(accountNumber, password);
         member.addAccount(account);
         memberRepository.saveAccount(member, account);
-        System.out.println("BanKU: 계좌번호: "+accountNumber+
+        System.out.println("BanKU: 계좌번호: " + accountNumber +
                 "\nBanKU: 계좌 생성이 완료되었습니다.");
     }
 
@@ -138,6 +138,139 @@ public class MemberService {
                 continue;
             }
             return accountNumber;
+        }
+    }
+
+    public void createDepositAccount(LocalDate nowDate, Member member, Scanner scanner) {
+        if (member.hasSavingAccount()) {
+            System.out.println("이미 적금 계좌가 존재합니다. 한 개의 적금 계좌만 만들 수 있습니다.");
+            return;
+        }
+
+        SavingsType type = selectDepositProduct(scanner);
+        String accountNumber = generateUniqueAccountNumber(nowDate);
+        String password = generatePassword(scanner);
+        SavingAccount savingAccount = new SavingAccount(accountNumber, password, nowDate, type, false);
+        member.addAccount(savingAccount);
+        member.setHasSavingAccount(true);
+        memberRepository.saveSavingsAccount(member, savingAccount);
+        System.out.println("BanKU: 적금 계좌번호: " + accountNumber + "\nBanKU: 적금 계좌 생성이 완료되었습니다.");
+    }
+
+    private String generatePassword(Scanner scanner) {
+        String password;
+        System.out.println("BanKU: 해당 계좌의 비밀번호(4자리 숫자)를 설정해주세요.\n" +
+                "-----------------------------------------------------------------------------------");
+        while (true) {
+            System.out.print("비밀번호 > ");
+            password = scanner.nextLine();
+            if (password.matches("\\d{4}")) {
+                break;
+            }
+            System.out.println("[ERROR] 올바르지 않은 입력입니다. 위 규칙에 알맞은 비밀번호를 입력해주세요");
+        }
+        return password;
+    }
+
+    public void closeDepositAccount(LocalDate nowDate, Member member, Scanner scanner) {
+        if (!member.hasSavingAccount()) {
+            System.out.println("해지 가능한 적금 계좌가 없습니다.");
+            return;
+        }
+        SavingAccount savingAccount = member.getAccounts().stream()
+                .filter(account -> account.isActive() && account instanceof SavingAccount )
+                .map(account -> (SavingAccount) account)
+                .findFirst()
+                .orElse(null);
+
+        System.out.print("적금 계좌를 해지하시겠습니까? (y 입력 시 진행) > ");
+        String input = scanner.nextLine().trim();
+        if (!input.equalsIgnoreCase("y")) {
+            System.out.println("적금 해지를 취소하였습니다.");
+            return;
+        }
+
+        List<Transaction> transactions = transactionRepository.findTransactionByAccount(savingAccount);
+        long totalAmount = savingAccount.computeInterest(transactions);
+
+        List<Account> regularAccounts = member.getAccounts().stream()
+                .filter(account -> !(account instanceof SavingAccount) &&
+                        account.isActive() &&
+                        account.canAcceptAmount(totalAmount))
+                .toList();
+
+        // 기본 입출금 게좌들이 이를 모두 수용할 수 없다면  바로 적금 계좌를 동결
+        if (regularAccounts.isEmpty()) {
+            savingAccount.deactivate();
+            savingAccount.setClosed();
+            member.setHasSavingAccount(false);
+            memberRepository.setSavingsAccountClosed(member, savingAccount);
+            System.out.println("입금 가능한 계좌가 없어 적금 계좌가 동결되었습니다.");
+            return;
+        }
+
+        Account receivingAccount = chooseReceivingAccount(scanner, regularAccounts);
+        receivingAccount.plus(totalAmount);
+        try {
+            transactionRepository.save(new Transaction(
+                    savingAccount.getAccountNumber(),
+                    nowDate,
+                    DEPOSIT,
+                    receivingAccount.getAccountNumber(),
+                    totalAmount,
+                    "적금계좌 잔액 송금"
+            ));
+        } catch (IOException e) {
+            System.out.println("[ERROR] transaction.txt 파일에 저장할 수 없습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
+            return;
+        }
+        System.out.println("적금 해지 완료. 금액이 입금되었습니다.");
+        List<Transaction> savingsTransactions = transactionRepository.findTransactionByAccount(savingAccount);
+        savingsTransactions.forEach(transactionRepository::deleteDepositTransaction);
+
+        savingAccount.deactivate();
+        savingAccount.setClosed();
+        member.setHasSavingAccount(false);
+    }
+
+    private SavingsType selectDepositProduct(Scanner scanner) {
+        System.out.println("적금 상품을 선택해주세요.");
+        System.out.println("1. 단기 (이율 2.0%, 중도해지 이율 0.1%)");
+        System.out.println("2. 중기 (이율 3.0%, 중도해지 이율 0.5%)");
+        System.out.println("3. 장기 (이율 4.0%, 중도해지 이율 1.0%)");
+
+        while (true) {
+            System.out.print("상품 번호 (1~3) > ");
+            String input = scanner.nextLine().trim();
+            switch (input) {
+                case "1":
+                    return SavingsType.SHORT;
+                case "2":
+                    return SavingsType.MID;
+                case "3":
+                    return SavingsType.LONG;
+                default:
+                    System.out.println("[ERROR] 잘못된 입력입니다. 1~3 사이의 숫자를 입력해주세요. > ");
+            }
+        }
+    }
+
+
+    private Account chooseReceivingAccount(Scanner scanner, List<Account> regularAccounts) {
+        System.out.println("적금 잔액을 입금할 계좌의 계좌번호를 입력해주세요:");
+        for (Account account : regularAccounts) {
+            System.out.println("- " + account.getAccountNumber());
+        }
+        while (true) {
+            System.out.print("계좌번호 입력 > ");
+            String input = scanner.nextLine().trim();
+            for (Account account : regularAccounts) {
+                if (account.getAccountNumber().equals(input)) {
+                    return account;
+                }
+            }
+            System.out.println("[ERROR] 올바른 계좌번호를 입력해주세요.");
         }
     }
 }

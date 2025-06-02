@@ -24,6 +24,10 @@ public class Account {
         balance += amount;
     }
 
+    public boolean canAcceptAmount(long amount) {
+        return balance <= Long.MAX_VALUE - amount;
+    }
+
     public void minus(long amount) {
         // 음수 검사
         if (balance - amount < 0) {

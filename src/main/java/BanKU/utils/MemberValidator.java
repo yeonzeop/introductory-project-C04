@@ -86,6 +86,24 @@ public class MemberValidator {
         }
     }
 
+    public LocalDate validateDate(String input) {
+        if (!input.matches("\\d{6}")) {
+            throw new IllegalArgumentException("[ERROR] 날짜는 YYMMDD 형식의 6자리 숫자로 입력해야 합니다.");
+        }
+
+        try {
+            int year = Integer.parseInt(input.substring(0, 2));
+            int month = Integer.parseInt(input.substring(2, 4));
+            int day = Integer.parseInt(input.substring(4, 6));
+
+            year += (year >= 0 && year <= 49) ? 2000 : 1900; // 예: 24 → 2024, 75 → 1975
+
+            return LocalDate.of(year, month, day);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("[ERROR] 유효한 날짜가 아닙니다. YYMMDD 형식에 맞는 실제 날짜를 입력해주세요.");
+        }
+    }
+
     private static String validateMemberAge(String birthday) {
         int yearSuffix = Integer.parseInt(birthday.substring(0, 2));
         boolean isInvalidRange = (yearSuffix >= 12 && yearSuffix <= 25);
@@ -132,7 +150,7 @@ public class MemberValidator {
      * - 4 자리가 아닌 숫자인 경우
      * - 숫자가 아닌 문자들이 섞여있는 경우
      */
-    private static Account validateAccount(String accountInfo) {
+    public static Account validateAccount(String accountInfo) {
         String[] strings = accountInfo.split("&");
         if (strings.length != 2) {
             throw new IllegalArgumentException();
