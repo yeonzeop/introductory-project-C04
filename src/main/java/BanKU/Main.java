@@ -19,7 +19,7 @@ public class Main {
     public static void main(String[] args) {
         // 1. 파일 읽어서 메모리에 로드
         MemberRepository memberRepository = new MemberRepository();     // user.txt 파일 읽어오기
-        DateRepository dateRepository = new DateRepository();           // date.txt 파일 읽어오기
+        DateRepository dateRepository = new DateRepository(memberRepository);           // date.txt 파일 읽어오기
         TransactionRepository transactionRepository = new TransactionRepository(memberRepository);      // transaction.txt 파일 읽어오기
         ReservationRepository reservationRepository = new ReservationRepository(transactionRepository, memberRepository);
 
