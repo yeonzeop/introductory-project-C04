@@ -24,7 +24,7 @@ public enum Menu {
 
     public static Menu of(Scanner scanner) {
         while (true) {
-            System.out.print("       메뉴를 입력해주세요(1~6 사이의 숫자) > ");
+            System.out.print("       메뉴를 입력해주세요(1~9 사이의 숫자) > ");
             String rawMenu = scanner.nextLine().trim();
             if (!rawMenu.matches("\\d{1}")) {
                 System.out.println("[ERROR] 올바른 번호를 입력해주세요.");
