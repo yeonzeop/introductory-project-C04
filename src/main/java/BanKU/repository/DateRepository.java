@@ -1,6 +1,7 @@
 package BanKU.repository;
 
 
+import BanKU.domain.Transaction;
 import BanKU.utils.DateValidator;
 
 import java.io.IOException;
@@ -33,6 +34,8 @@ public class DateRepository {
         } catch (IOException | URISyntaxException e) {
             System.out.println("[ERROR] date.txt 파일을 읽어올 수 없습니다. 프로그램을 종료합니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        } catch(IllegalArgumentException e){
+            System.out.println(e.getMessage());
         }
     }
 
@@ -42,6 +45,11 @@ public class DateRepository {
                 .map(this::safeValidateDate)
                 .filter(Objects::nonNull)
                 .forEach(this::addDates);
+        List<Transaction> transactions = transactionRepository.getTransactions();
+        Transaction lastTransaction = transactions.get(transactions.size()-1);
+        if(lastTransaction.getDate().isAfter(dates.get(dates.size() - 1))){
+            throw new IllegalArgumentException("[ERROR] 날짜 파일에 이상을 감지하여 프로그램을 종료합니다.");
+        }
     }
 
     private LocalDate safeValidateDate(String line) {

@@ -173,4 +173,8 @@ public class TransactionRepository {
             System.out.println("[ERROR] 적금 거래내역 삭제 중 오류 발생: " + e.getMessage());
         }
     }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
 }
