@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static BanKU.Main.RESERVATION_FILE_PATH;
+import static BanKU.Main.TRANSACTION_FILE_PATH;
 
 public class ReservationRepository {
     private final TransactionRepository transactionRepository;
@@ -93,5 +94,9 @@ public class ReservationRepository {
     }
 
     public void save(Reservation reservation) throws IOException{
+        Path path = Paths.get(RESERVATION_FILE_PATH);
+        String str = getLine(reservation);
+        validLines.add(str);
+        Files.write(path, validLines);
     }
 }
