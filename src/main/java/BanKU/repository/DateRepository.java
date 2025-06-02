@@ -1,6 +1,7 @@
 package BanKU.repository;
 
 
+import BanKU.domain.Transaction;
 import BanKU.utils.DateValidator;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -21,13 +23,19 @@ public class DateRepository {
 
     private final List<LocalDate> dates = new ArrayList<>();
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
+    private final MemberRepository memberRepository;
+    private final TransactionRepository transactionRepository;
 
-    public DateRepository() {
+    public DateRepository(MemberRepository memberRepository, TransactionRepository transactionRepository) {
+        this.memberRepository = memberRepository;
+        this.transactionRepository = transactionRepository;
         try {
             loadDateFile();
         } catch (IOException | URISyntaxException e) {
             System.out.println("[ERROR] date.txt 파일을 읽어올 수 없습니다. 프로그램을 종료합니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        } catch(IllegalArgumentException e){
+            System.out.println(e.getMessage());
         }
     }
 
@@ -37,6 +45,11 @@ public class DateRepository {
                 .map(this::safeValidateDate)
                 .filter(Objects::nonNull)
                 .forEach(this::addDates);
+        List<Transaction> transactions = transactionRepository.getTransactions();
+        Transaction lastTransaction = transactions.get(transactions.size()-1);
+        if(lastTransaction.getDate().isAfter(dates.get(dates.size() - 1))){
+            throw new IllegalArgumentException("[ERROR] 날짜 파일에 이상을 감지하여 프로그램을 종료합니다.");
+        }
     }
 
     private LocalDate safeValidateDate(String line) {
@@ -67,6 +80,10 @@ public class DateRepository {
         LocalDate lastDate = dates.get(dates.size() - 1);
         if (!lastDate.isBefore(nowDate)) {
             throw new IllegalArgumentException("[ERROR] " + lastDate.format(formatter) + " 보다 이후의 날짜여야 합니다. 현재 날짜를 다시 입력해주세요.");
+        }
+        long diffMonths = ChronoUnit.MONTHS.between(nowDate,dates.get(dates.size() - 1));
+        if( diffMonths > 0){
+            memberRepository.freeAccountInterest(diffMonths);
         }
     }
 

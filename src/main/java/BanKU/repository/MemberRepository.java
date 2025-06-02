@@ -215,4 +215,14 @@ public class MemberRepository {
             System.out.println("[ERROR] 적금 계좌 정보를 파일을 변경하는 데 실패했습니다.");
         }
     }
+
+    public void freeAccountInterest(long diffMonths){
+        double interestRate = 0.1;
+        for(Account account: accounts.values()){
+            if(account.isActive()){
+                long interest = (long)Math.ceil(account.getBalance() * ( diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
+                account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
+            }
+        }
+    }
 }

@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +72,10 @@ public class TransactionRepository {
 
         try {
             transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
+            long diffMonths = ChronoUnit.MONTHS.between(transaction.getDate(),transactions.get(transactions.size()-1).getDate());
+            if(diffMonths > 0){
+                memberRepository.freeAccountInterest(diffMonths);
+            }
         } catch (IllegalArgumentException e) {
             if (transaction.getType() == TransactionType.DEPOSIT) {
                 senderAccount.deactivate();
@@ -167,5 +172,9 @@ public class TransactionRepository {
         } catch (IOException e) {
             System.out.println("[ERROR] 적금 거래내역 삭제 중 오류 발생: " + e.getMessage());
         }
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 }

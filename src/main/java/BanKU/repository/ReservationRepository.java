@@ -91,4 +91,11 @@ public class ReservationRepository {
         }
         return str;
     }
+
+    public void save(Reservation reservation) throws IOException{
+        Path path = Paths.get(RESERVATION_FILE_PATH);
+        String str = getLine(reservation);
+        validLines.add(str);
+        Files.write(path, validLines);
+    }
 }

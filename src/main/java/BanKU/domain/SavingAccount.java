@@ -62,7 +62,7 @@ public class SavingAccount extends Account {
             totalInterest += interest;
         }
 
-        return (long) Math.floor(totalInterest);
+        return (long) Math.ceil(totalInterest);
     }
 
     public void setClosed() {

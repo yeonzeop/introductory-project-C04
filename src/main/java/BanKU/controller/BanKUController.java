@@ -79,6 +79,7 @@ public class BanKUController {
                 case ACCOUNT_CREATION -> memberService.createAccount(nowDate, member, scanner);
                 case SAVING_ACCOUNT_CREATION -> memberService.createDepositAccount(nowDate, member, scanner);
                 case SAVING_ACCOUNT_CLOSED -> memberService.closeDepositAccount(nowDate, member, scanner);
+                case TRANSFER_RESERVATION -> accountService.transferReserve(account,scanner);
                 case QUIT -> {
                     if (quit(scanner)) {
                         return;

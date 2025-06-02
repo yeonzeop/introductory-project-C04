@@ -11,7 +11,8 @@ public enum Menu {
     ACCOUNT_CREATION("계좌 생성", 5),
     SAVING_ACCOUNT_CREATION("적금 계좌 가입", 6),
     SAVING_ACCOUNT_CLOSED("적금 계좌 해지", 7),
-    QUIT("종료", 8);
+    TRANSFER_RESERVATION("예약 송금", 8),
+    QUIT("종료", 9);
 
     private final String description;
     private final int menuNumber;
@@ -23,7 +24,7 @@ public enum Menu {
 
     public static Menu of(Scanner scanner) {
         while (true) {
-            System.out.print("       메뉴를 입력해주세요(1~6 사이의 숫자) > ");
+            System.out.print("       메뉴를 입력해주세요(1~9 사이의 숫자) > ");
             String rawMenu = scanner.nextLine().trim();
             if (!rawMenu.matches("\\d{1}")) {
                 System.out.println("[ERROR] 올바른 번호를 입력해주세요.");

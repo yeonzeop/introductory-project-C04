@@ -1,10 +1,7 @@
 package BanKU.service;
 
 
-import BanKU.domain.Account;
-import BanKU.domain.Member;
-import BanKU.domain.SavingAccount;
-import BanKU.domain.Transaction;
+import BanKU.domain.*;
 import BanKU.enums.TransactionType;
 import BanKU.repository.MemberRepository;
 import BanKU.repository.ReservationRepository;
@@ -18,6 +15,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import static BanKU.enums.TransactionType.*;
+import static BanKU.utils.DateValidator.validateDate;
 import static BanKU.utils.TransactionValidator.AMOUNT_LIMIT;
 
 public class AccountService {
@@ -210,6 +208,30 @@ public class AccountService {
 
     }
 
+    public void transferReserve(Account senderAccount, Scanner scanner){
+        if (!senderAccount.isActive()) {
+            System.out.println("[ERROR] 비활성화된 계좌에서 송금할 수 없습니다.");
+            return;
+        }
+        try {
+            boolean isFirstPrint = true;
+            Account receiverAccount = getReceiverAccount(senderAccount, scanner, isFirstPrint);
+            long amount = getAmount(senderAccount, scanner, TRANSFER);
+            LocalDate transferDate = getTransferDate(scanner);
+            checkAccountPassword(senderAccount, scanner);
+            String memo = requestMemo(scanner);
+
+            Reservation reservation = new Reservation(senderAccount.getAccountNumber(),transferDate,receiverAccount.getAccountNumber(),amount,memo);
+            reservationRepository.save(reservation);
+            System.out.println("BanKU: 예약 송금이 완료되었습니다.\n" +
+                    "        예약 송금 한 계좌(사용자 계좌): " + senderAccount.getAccountNumber() + " 잔액(단위: 원): " + senderAccount.getBalance() + "원");
+        } catch (IOException e) {
+            System.out.println("[ERROR] reservation.txt 파일에 저장할 수 없습니다.");
+            System.out.println("[ERROR MESSAGE] " + e.getMessage());
+        }
+
+    }
+
     private Account getReceiverAccount(Account senderAccount, Scanner scanner, boolean isFirstPrint) {
         while (true) {
             String accountNumber = InputView.requestReceiverAccount(senderAccount, scanner, isFirstPrint);
@@ -250,5 +272,22 @@ public class AccountService {
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
         }
     }
+
+    public LocalDate getTransferDate(Scanner scanner){
+        LocalDate transferDate;
+        while(true) {
+            try {
+                System.out.print("BanKU: 날짜를 입력해주세요 (YYMMDD 형식, 예: 251225) > ");
+                transferDate = validateDate(scanner.nextLine());
+                if(!transferDate.isAfter(now)){
+                    throw new IllegalArgumentException("[ERROR] 현재 시점 이후의 날짜만 입력 가능합니다.");
+                }
+                return transferDate;
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
 
 }
