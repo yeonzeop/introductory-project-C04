@@ -72,9 +72,11 @@ public class TransactionRepository {
 
         try {
             transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
-            long diffMonths = ChronoUnit.MONTHS.between(transaction.getDate(),transactions.get(transactions.size()-1).getDate());
-            if(diffMonths > 0){
-                memberRepository.freeAccountInterest(diffMonths);
+            if(transactions.size()!=0) {
+                long diffMonths = ChronoUnit.MONTHS.between(transaction.getDate(), transactions.get(transactions.size() - 1).getDate());
+                if (diffMonths > 0) {
+                    memberRepository.freeAccountInterest(diffMonths);
+                }
             }
         } catch (IllegalArgumentException e) {
             if (transaction.getType() == TransactionType.DEPOSIT) {
