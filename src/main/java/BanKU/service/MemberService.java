@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Scanner;
 
@@ -174,23 +175,54 @@ public class MemberService {
 
     public void closeDepositAccount(LocalDate nowDate, Member member, Scanner scanner) {
         if (!member.hasSavingAccount()) {
-            System.out.println("해지 가능한 적금 계좌가 없습니다.");
+            System.out.println("BanKU: 적금 계좌가 존재하지 않습니다.");
             return;
         }
         SavingAccount savingAccount = member.getAccounts().stream()
-                .filter(account -> account.isActive() && account instanceof SavingAccount )
+                .filter(account -> account.isActive() && account instanceof SavingAccount)
                 .map(account -> (SavingAccount) account)
                 .findFirst()
                 .orElse(null);
 
-        System.out.print("적금 계좌를 해지하시겠습니까? (y 입력 시 진행) > ");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        // 가입 개월 수 계산
+        long monthsBetween = ChronoUnit.MONTHS.between(savingAccount.getStartDay(), savingAccount.getEndDay());
+        String productName;
+        if (monthsBetween == 6) {
+            productName = "자유 적금 - 6개월";
+        } else if (monthsBetween == 12) {
+            productName = "자유 적금 - 12개월";
+        } else {
+            productName = "자유 적금 - 18개월";
+        }
+
+        System.out.println("BanKU: --------------------------------------------------------------------------");
+        System.out.println("                                   적금           해지                             ");
+        System.out.println("       --------------------------------------------------------------------------");
+        System.out.printf("       적금 가입일: %s (%d일)%15s가입 상품 명: %s%n",
+                savingAccount.getStartDay().format(formatter),
+                savingAccount.getStartDay().isLeapYear() ? 366 : 365,
+                "",
+                productName
+        );
+        System.out.printf("       적용 금리: %.1f%%%30s잔액(단위: 원):     %,d원%n",
+                savingAccount.getRate() * 100,
+                "",
+                (int) savingAccount.getBalance()
+        );
+        System.out.println();
+        if (nowDate.isBefore(savingAccount.getEndDay())) {
+            System.out.print("       적금 만기일에 도달 전입니다. 정말 해지하시겠습니까? (y/n)> ");
+        } else {
+            System.out.print("       적금 만기일에 도달했습니다. 정말 해지하시겠습니까? (y/n)> ");
+        }
         String input = scanner.nextLine().trim();
         if (!input.equalsIgnoreCase("y")) {
             System.out.println("적금 해지를 취소하였습니다.");
             return;
         }
 
-        List<Transaction> transactions = transactionRepository.findTransactionByAccount(savingAccount);
+        List<Transaction> transactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
         long totalAmount = savingAccount.computeInterest(transactions);
 
         List<Account> regularAccounts = member.getAccounts().stream()
@@ -226,7 +258,7 @@ public class MemberService {
             return;
         }
         System.out.println("적금 해지 완료. 금액이 입금되었습니다.");
-        List<Transaction> savingsTransactions = transactionRepository.findTransactionByAccount(savingAccount);
+        List<Transaction> savingsTransactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
         savingsTransactions.forEach(transactionRepository::deleteDepositTransaction);
 
         savingAccount.deactivate();

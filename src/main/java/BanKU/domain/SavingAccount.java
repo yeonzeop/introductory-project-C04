@@ -51,18 +51,17 @@ public class SavingAccount extends Account {
     }
 
     public long computeInterest(List<Transaction> transactions) {
-        double totalInterest = 0.0;
-        boolean isLeapYear = endDay.isLeapYear();       // 윤년인지 아닌지 판단
-        double daysInYear = isLeapYear ? 366.0 : 365.0;
-
+        long totalDeposited = 0;
         for (Transaction transaction : transactions) {
-            long days = ChronoUnit.DAYS.between(transaction.getDate(), endDay);
-            double applicableRate = isClosed ? getRate() : getEarlyRate();
-            double interest = transaction.getAmount() * applicableRate * (days / daysInYear);
-            totalInterest += interest;
+            totalDeposited += transaction.getAmount();
         }
+        boolean isMature = !LocalDate.now().isBefore(endDay);
+        double applicableRate = isMature ? getRate() : getEarlyRate();
 
-        return (long) Math.ceil(totalInterest);
+        double interest = totalDeposited * applicableRate;
+        long remain = (long) Math.ceil(totalDeposited + interest);
+        System.out.println("[LOG] 적금계좌에서 이자 계산 후 잔액 = " + remain);
+        return remain;
     }
 
     public void setClosed() {

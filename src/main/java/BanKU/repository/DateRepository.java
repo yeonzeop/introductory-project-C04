@@ -13,6 +13,7 @@ import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.time.LocalDate;
@@ -47,11 +48,14 @@ public class DateRepository {
                 .map(this::safeValidateDate)
                 .filter(Objects::nonNull)
                 .forEach(this::addDates);
-        List<Transaction> transactions = transactionRepository.getTransactions();
-        if (!transactions.isEmpty() && !dates.isEmpty()) {
-            Transaction lastTransaction = transactions.get(transactions.size() - 1);
+        List<Transaction> allTransactions = new ArrayList<>();
+        allTransactions.addAll(transactionRepository.getRegularTransactions());
+        allTransactions.addAll(transactionRepository.getSavingTransactions());
+        allTransactions.sort(Comparator.comparing(Transaction::getDate));
+        if (!allTransactions.isEmpty() && !dates.isEmpty()) {
+            Transaction lastTransaction = allTransactions.get(allTransactions.size() - 1);
             LocalDate lastDateInFile = dates.get(dates.size() - 1);
-            if(lastTransaction.getDate().isAfter(lastDateInFile)){
+            if (lastTransaction.getDate().isAfter(lastDateInFile)) {
                 throw new IllegalArgumentException("[ERROR] 날짜 파일에 이상을 감지하여 프로그램을 종료합니다.");
             }
         }

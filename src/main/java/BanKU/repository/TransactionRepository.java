@@ -3,7 +3,6 @@ package BanKU.repository;
 import BanKU.domain.Account;
 import BanKU.domain.SavingAccount;
 import BanKU.domain.Transaction;
-import BanKU.enums.TransactionType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +19,8 @@ import static BanKU.Main.TRANSACTION_FILE_PATH;
 
 public class TransactionRepository {
     private final MemberRepository memberRepository;
-    private final List<Transaction> transactions = new ArrayList<>();
+    private final List<Transaction> regularTransactions = new ArrayList<>();
+    private final List<Transaction> savingTransactions = new ArrayList<>();
     List<String> validRegularTransactionLines = new ArrayList<>();
     List<String> validSavingTransactionLines = new ArrayList<>();
 
@@ -42,10 +42,10 @@ public class TransactionRepository {
             try {
                 String[] strings = line.split("\\|");
                 Transaction transaction = Transaction.from(strings);
-                validateDate(transaction);
-                validateTransaction(transaction);       // 계좌 잔액에 반영
+                validateDate(regularTransactions, transaction);
+                validateTransaction(regularTransactions, transaction);       // 계좌 잔액에 반영
                 validRegularTransactionLines.add(line);                   // 유효한 행만 저장
-                transactions.add(transaction);
+                regularTransactions.add(transaction);
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
@@ -53,7 +53,7 @@ public class TransactionRepository {
         Files.write(path, validRegularTransactionLines);          // 유효한 행들만 다시 파일에 덮어쓰기
     }
 
-    private void validateDate(Transaction transaction) {
+    private void validateDate(List<Transaction> transactions, Transaction transaction) {
         // 첫 번째 거래는 무조건 유효
         if (transactions.isEmpty()) {
             return;
@@ -62,28 +62,28 @@ public class TransactionRepository {
                 .getDate()
                 .isAfter(transaction.getDate());
         if (!isValidDate) {
+            System.out.println();
+            System.out.println("직전 거래내역 날짜 = " + transactions.get(transactions.size() - 1).getDate());
+            System.out.println("현재 거래내역 날짜 = " + transaction.getDate());
             throw new IllegalArgumentException("[WARNING] 거래내역 데이터에 손실이 있습니다. 해당 행을 무시합니다. 날짜: " + transaction.getDate());
         }
     }
 
-    private void validateTransaction(Transaction transaction) throws IllegalArgumentException {
+    private void validateTransaction(List<Transaction> regularTransactions, Transaction transaction) throws IllegalArgumentException {
         Account senderAccount = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
         Account receiverAccount = memberRepository.findAccountByNumber(transaction.getReceiverAccountNumber());
 
         try {
             transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
-            if(transactions.size()!=0) {
-                long diffMonths = ChronoUnit.MONTHS.between(transaction.getDate(), transactions.get(transactions.size() - 1).getDate());
+            if(!regularTransactions.isEmpty()) {
+                long diffMonths = ChronoUnit.MONTHS.between(transaction.getDate(),
+                        regularTransactions.get(regularTransactions.size() - 1).getDate());
                 if (diffMonths > 0) {
                     memberRepository.freeAccountInterest(diffMonths);
                 }
             }
         } catch (IllegalArgumentException e) {
-            if (transaction.getType() == TransactionType.DEPOSIT) {
-                senderAccount.deactivate();
-            } else {
-                senderAccount.deactivate();
-            }
+            senderAccount.deactivate();
             System.out.println(e.getMessage());
         }
     }
@@ -112,14 +112,6 @@ public class TransactionRepository {
         return str;
     }
 
-    public void printTransactions() {
-        System.out.println("[TransactionRepository]");
-        for (Transaction transaction : transactions) {
-            System.out.println(transaction.toString());
-        }
-        System.out.println();
-    }
-
     public void loadDepositTransactionFile() {
         Path path = Paths.get(DEPOSIT_TRANSACTION_FILE_PATH);
         try {
@@ -128,10 +120,10 @@ public class TransactionRepository {
                 try {
                     String[] strings = line.split("\\|");
                     Transaction transaction = Transaction.from(strings);
-                    validateDate(transaction);
-                    validateTransaction(transaction);
+                    validateDate(savingTransactions, transaction);
+                    validateTransaction(savingTransactions, transaction);
                     validSavingTransactionLines.add(line);
-                    transactions.add(transaction);
+                    savingTransactions.add(transaction);
                 } catch (IllegalArgumentException e) {
                     System.out.println(e.getMessage());
                 }
@@ -143,9 +135,9 @@ public class TransactionRepository {
         }
     }
 
-    public List<Transaction> findTransactionByAccount(SavingAccount savingAccount) {
+    public List<Transaction> findSavingTransactionByAccount(SavingAccount savingAccount) {
         List<Transaction> result = new ArrayList<>();
-        for (Transaction transaction : transactions) {
+        for (Transaction transaction : regularTransactions) {
             if (transaction.getSenderAccountNumber().equals(savingAccount.getAccountNumber())) {
                 result.add(transaction);
             }
@@ -176,7 +168,11 @@ public class TransactionRepository {
         }
     }
 
-    public List<Transaction> getTransactions() {
-        return transactions;
+    public List<Transaction> getRegularTransactions() {
+        return regularTransactions;
+    }
+
+    public List<Transaction> getSavingTransactions() {
+        return savingTransactions;
     }
 }
