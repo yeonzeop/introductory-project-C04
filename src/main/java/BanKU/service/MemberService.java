@@ -129,10 +129,10 @@ public class MemberService {
         SecureRandom random = new SecureRandom();
         while (true) {
             StringBuilder sb = new StringBuilder();
-            while (sb.length() < 8) {
+            while (sb.length() < 6) {
                 sb.append(random.nextInt(10));      // 0~9 중 하나 추가
             }
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMdd"); // 흠 이건 어카지...
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd"); // 흠 이건 어카지...
             String accountNumber = nowDate.format(formatter) + sb.toString();
             if (memberRepository.isPresentAccount(accountNumber)) {
                 continue;

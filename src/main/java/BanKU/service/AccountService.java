@@ -240,6 +240,7 @@ public class AccountService {
                 continue;
             }
             try {
+//                System.out.println("[getReceiverAccount] accountNumber = " + accountNumber);
                 return memberRepository.findAccountByNumber(accountNumber);
             } catch (IllegalArgumentException e) {
                 System.out.println("[ERROR] 존재하지 않는 계좌번호입니다. 다시 입력해주세요.");

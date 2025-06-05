@@ -194,6 +194,7 @@ public class MemberRepository {
 //            System.out.println("[LOG] 적금계좌 저장 형태 = " + sb.toString());
             writer.write(sb.toString());
             writer.newLine();
+            accounts.put(savingAccount.getAccountNumber(), savingAccount);
         } catch (IOException e) {
             System.out.println("[ERROR] 적금 계좌 정보를 파일에 저장하는 데 실패했습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
