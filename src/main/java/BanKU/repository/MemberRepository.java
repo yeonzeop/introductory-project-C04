@@ -221,6 +221,8 @@ public class MemberRepository {
         for (Account account : accounts.values()) {
             if (account.isActive()) {
                 long interest = (long) Math.ceil(account.getBalance() * (diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
+                // 확인용 출력
+//                System.out.println("이자: " + interest);
                 account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
             }
         }

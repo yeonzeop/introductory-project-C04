@@ -76,8 +76,7 @@ public class TransactionRepository {
         try {
             transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
             if(!regularTransactions.isEmpty()) {
-                long diffMonths = ChronoUnit.MONTHS.between(transaction.getDate(),
-                        regularTransactions.get(regularTransactions.size() - 1).getDate());
+                long diffMonths = ChronoUnit.MONTHS.between(regularTransactions.get(regularTransactions.size() - 1).getDate(),transaction.getDate());
                 if (diffMonths > 0) {
                     memberRepository.freeAccountInterest(diffMonths);
                 }
