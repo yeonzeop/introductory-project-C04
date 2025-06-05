@@ -223,7 +223,9 @@ public class MemberService {
         }
 
         List<Transaction> transactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
+
         long totalAmount = savingAccount.computeInterest(transactions);
+
 
         List<Account> regularAccounts = member.getAccounts().stream()
                 .filter(account -> !(account instanceof SavingAccount) &&

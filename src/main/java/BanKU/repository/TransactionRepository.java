@@ -137,7 +137,7 @@ public class TransactionRepository {
 
     public List<Transaction> findSavingTransactionByAccount(SavingAccount savingAccount) {
         List<Transaction> result = new ArrayList<>();
-        for (Transaction transaction : regularTransactions) {
+        for (Transaction transaction : savingTransactions) {
             if (transaction.getSenderAccountNumber().equals(savingAccount.getAccountNumber())) {
                 result.add(transaction);
             }

@@ -53,15 +53,14 @@ public class SavingAccount extends Account {
     public long computeInterest(List<Transaction> transactions) {
         long totalDeposited = 0;
         for (Transaction transaction : transactions) {
+//            System.out.println("[LOG] 거래내역 = "+transaction.toString());
             totalDeposited += transaction.getAmount();
         }
         boolean isMature = !LocalDate.now().isBefore(endDay);
         double applicableRate = isMature ? getRate() : getEarlyRate();
 
         double interest = totalDeposited * applicableRate;
-        long remain = (long) Math.ceil(totalDeposited + interest);
-        System.out.println("[LOG] 적금계좌에서 이자 계산 후 잔액 = " + remain);
-        return remain;
+        return (long) Math.ceil(totalDeposited + interest);
     }
 
     public void setClosed() {
