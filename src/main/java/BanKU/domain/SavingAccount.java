@@ -51,16 +51,20 @@ public class SavingAccount extends Account {
     }
 
     public long computeInterest(List<Transaction> transactions) {
+        long totalDeposited = computeTotalDeposited(transactions);
+        boolean isMature = !LocalDate.now().isBefore(endDay);
+        double applicableRate = isMature ? getRate() : getEarlyRate();
+
+        return (long)Math.ceil(totalDeposited * applicableRate);
+    }
+
+    public long computeTotalDeposited(List<Transaction> transactions) {
         long totalDeposited = 0;
         for (Transaction transaction : transactions) {
 //            System.out.println("[LOG] 거래내역 = "+transaction.toString());
             totalDeposited += transaction.getAmount();
         }
-        boolean isMature = !LocalDate.now().isBefore(endDay);
-        double applicableRate = isMature ? getRate() : getEarlyRate();
-
-        double interest = totalDeposited * applicableRate;
-        return (long) Math.ceil(totalDeposited + interest);
+        return totalDeposited;
     }
 
     public void setClosed() {

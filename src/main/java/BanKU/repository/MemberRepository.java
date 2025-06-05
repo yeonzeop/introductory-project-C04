@@ -226,4 +226,21 @@ public class MemberRepository {
             }
         }
     }
+
+    public void closeAccount(SavingAccount savingAccount) {
+        Path path = Paths.get(DEPOSIT_INFO_FILE_PATH);
+        try {
+            List<String> lines = Files.readAllLines(path);
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.contains(savingAccount.getAccountNumber())) {
+                    lines.set(i, line.replace("opened", "closed"));
+                    break;
+                }
+            }
+            Files.write(path, lines);
+        } catch (IOException e) {
+            System.out.println("[ERROR] 적금 계좌 상태를 'closed'로 변경하는 데 실패했습니다.");
+        }
+    }
 }

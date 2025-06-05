@@ -164,7 +164,7 @@ public class MemberService {
                 "-----------------------------------------------------------------------------------");
         while (true) {
             System.out.print("비밀번호 > ");
-            password = scanner.nextLine();
+            password = scanner.nextLine().trim();
             if (password.matches("\\d{4}")) {
                 break;
             }
@@ -223,8 +223,9 @@ public class MemberService {
         }
 
         List<Transaction> transactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
-
-        long totalAmount = savingAccount.computeInterest(transactions);
+        long interest = savingAccount.computeInterest(transactions);
+        long totalDeposited = savingAccount.computeTotalDeposited(transactions);
+        long totalAmount = interest + totalDeposited;
 
 
         List<Account> regularAccounts = member.getAccounts().stream()
@@ -233,17 +234,28 @@ public class MemberService {
                         account.canAcceptAmount(totalAmount))
                 .toList();
 
-        // 기본 입출금 게좌들이 이를 모두 수용할 수 없다면  바로 적금 계좌를 동결
         if (regularAccounts.isEmpty()) {
             savingAccount.deactivate();
             savingAccount.setClosed();
+            memberRepository.closeAccount(savingAccount);
             member.setHasSavingAccount(false);
             memberRepository.setSavingsAccountClosed(member, savingAccount);
-            System.out.println("입금 가능한 계좌가 없어 적금 계좌가 동결되었습니다.");
+            System.out.println("BanKU: 해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.\n");
             return;
         }
 
-        Account receivingAccount = chooseReceivingAccount(scanner, regularAccounts);
+        Account receivingAccount = chooseReceivingAccount(scanner, savingAccount, regularAccounts);
+        while(true) {
+            System.out.print("BanKU: 계좌 비밀번호를 입력해주세요(숫자 4자리로 입력해주세요) > ");
+            String rawPassword = scanner.nextLine().trim();
+            if (rawPassword.matches("\\d{4}")) {
+                if (savingAccount.getPassword().equals(rawPassword)){
+                    break;
+                }
+                System.out.println("[ERROR] 올바른 비밀번호가 아닙니다. 다시 한번 비밀번호를 입력해주세요.");
+            }
+            System.out.println("[ERROR] 계좌 비밀번호는 숫자로만 입력가능합니다. 다시 한번 비밀번호를 입력해주세요.");
+        }
         receivingAccount.plus(totalAmount);
         try {
             transactionRepository.save(new Transaction(
@@ -259,12 +271,13 @@ public class MemberService {
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
             return;
         }
-        System.out.println("적금 해지 완료. 금액이 입금되었습니다.");
+        System.out.println("BanKU: 수령이 완료되었습니다.");
         List<Transaction> savingsTransactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
         savingsTransactions.forEach(transactionRepository::deleteDepositTransaction);
 
         savingAccount.deactivate();
         savingAccount.setClosed();
+        memberRepository.closeAccount(savingAccount);
         member.setHasSavingAccount(false);
     }
 
@@ -299,20 +312,35 @@ public class MemberService {
     }
 
 
-    private Account chooseReceivingAccount(Scanner scanner, List<Account> regularAccounts) {
-        System.out.println("적금 잔액을 입금할 계좌의 계좌번호를 입력해주세요:");
-        for (Account account : regularAccounts) {
-            System.out.println("- " + account.getAccountNumber());
-        }
+    private Account chooseReceivingAccount(Scanner scanner, SavingAccount savingAccount, List<Account> regularAccounts) {
+        List<Transaction> transactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
+        long interest = savingAccount.computeInterest(transactions);
+        long totalDeposited = savingAccount.computeTotalDeposited(transactions);
+        long totalAmount = interest + totalDeposited;
+
+        System.out.println("BanKU: --------------------------------------------------------------------------");
+        System.out.println("                          실수령액    확인    및    수령   계좌   입력                  ");
+        System.out.println("       ---------------------------------------------------------------------------");
+        System.out.printf("       납부 금액(단위: 원): %,d원 %n", totalDeposited);
+        System.out.printf("       적용 금리: %.1f%%%30s이자(단위: 원):     %,d원%n",
+                savingAccount.getRate() * 100,
+                "",
+                interest);
+        System.out.printf("       실수령액: %,d원%n", totalAmount);
+
         while (true) {
-            System.out.print("계좌번호 입력 > ");
-            String input = scanner.nextLine().trim();
+            System.out.printf("       수령받을 계좌번호를 입력해주세요(-없이 숫자로만 입력해주세요) > ");
+            String rawAccountNumber = scanner.nextLine().trim();
+            if (!rawAccountNumber.matches("\\d{12}")) {
+                System.out.println("BanKU: 계좌 번호는 -없이 숫자로만 입력가능합니다. 다시 입력해주세요.\n");
+                continue;
+            }
             for (Account account : regularAccounts) {
-                if (account.getAccountNumber().equals(input)) {
+                if (account.getAccountNumber().equals(rawAccountNumber)) {
                     return account;
                 }
             }
-            System.out.println("[ERROR] 올바른 계좌번호를 입력해주세요.");
+            System.out.println("BanKU: 본인 명의가 아닌 계좌로는 수령할 수 없습니다.");
         }
     }
 }
