@@ -165,6 +165,14 @@ public class AccountService {
             boolean isFirstPrint = true;
             Account receiverAccount = getReceiverAccount(senderAccount, scanner, isFirstPrint);
             long amount = getAmount(senderAccount, scanner, TRANSFER);
+
+            if (receiverAccount instanceof SavingAccount) {
+                long totalReceivedToday = transactionRepository.getTotalDepositAmount(receiverAccount.getAccountNumber(), now);
+                if (totalReceivedToday + amount > 1_000_000) {
+                    System.out.println("[ERROR] 해당 계좌의 일일 입금 한도(1,000,000원)를 초과할 수 없습니다.");
+                    return;
+                }
+            }
             if (!receiverAccount.canAcceptAmount(amount)) {
                 System.out.println("BanKU: 계좌 잔액 문제가 발생하여 해당 계좌를 비활성화 합니다. [비활성 계좌: " + receiverAccount.getAccountNumber() + "]");
                 receiverAccount.deactivate();
