@@ -223,7 +223,7 @@ public class MemberService {
         }
 
         List<Transaction> transactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
-        long interest = savingAccount.computeInterest(transactions);
+        long interest = savingAccount.computeInterest(nowDate, transactions);
         long totalDeposited = savingAccount.computeTotalDeposited(transactions);
         long totalAmount = interest + totalDeposited;
 
@@ -244,7 +244,7 @@ public class MemberService {
             return;
         }
 
-        Account receivingAccount = chooseReceivingAccount(scanner, savingAccount, regularAccounts);
+        Account receivingAccount = chooseReceivingAccount(scanner, nowDate, savingAccount, regularAccounts);
         while(true) {
             System.out.print("BanKU: 계좌 비밀번호를 입력해주세요(숫자 4자리로 입력해주세요) > ");
             String rawPassword = scanner.nextLine().trim();
@@ -312,9 +312,9 @@ public class MemberService {
     }
 
 
-    private Account chooseReceivingAccount(Scanner scanner, SavingAccount savingAccount, List<Account> regularAccounts) {
+    private Account chooseReceivingAccount(Scanner scanner, LocalDate nowDate, SavingAccount savingAccount, List<Account> regularAccounts) {
         List<Transaction> transactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
-        long interest = savingAccount.computeInterest(transactions);
+        long interest = savingAccount.computeInterest(nowDate, transactions);
         long totalDeposited = savingAccount.computeTotalDeposited(transactions);
         long totalAmount = interest + totalDeposited;
 

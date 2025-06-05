@@ -7,7 +7,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static BanKU.utils.DateValidator.validateDate;
-import static BanKU.utils.MemberValidator.*;
+import static BanKU.utils.MemberValidator.validateAccount;
+import static BanKU.utils.MemberValidator.validateLoginId;
 
 public class SavingAccount extends Account {
 
@@ -38,7 +39,8 @@ public class SavingAccount extends Account {
                 this.rate = 0.04;
                 this.earlyRate = 0.01;
             }
-            default -> {}
+            default -> {
+            }
         }
     }
 
@@ -50,12 +52,11 @@ public class SavingAccount extends Account {
         return earlyRate;
     }
 
-    public long computeInterest(List<Transaction> transactions) {
+    public long computeInterest(LocalDate nowDate, List<Transaction> transactions) {
         long totalDeposited = computeTotalDeposited(transactions);
-        boolean isMature = !LocalDate.now().isBefore(endDay);
+        boolean isMature = !nowDate.isBefore(endDay);
         double applicableRate = isMature ? getRate() : getEarlyRate();
-
-        return (long)Math.ceil(totalDeposited * applicableRate);
+        return (long) Math.ceil(totalDeposited * applicableRate);
     }
 
     public long computeTotalDeposited(List<Transaction> transactions) {
@@ -106,6 +107,7 @@ public class SavingAccount extends Account {
             default -> throw new IllegalArgumentException("[ERROR] 적금 기간은 6개월, 12개월, 18개월 중 하나여야 합니다.");
         };
     }
+
     public LocalDate getStartDay() {
         return startDay;
     }
