@@ -9,8 +9,8 @@ public enum Menu {
     TRANSFER("송금", 3),
     ACCOUNT_INQUIRY("계좌 조회", 4),
     ACCOUNT_CREATION("계좌 생성", 5),
-    SAVING_ACCOUNT_CREATION("적금 계좌 가입", 6),
-    SAVING_ACCOUNT_CLOSED("적금 계좌 해지", 7),
+    SAVING_ACCOUNT_CREATION("적금 계좌 생성", 6),
+    SAVING_ACCOUNT_CLOSED("적금 해지", 7),
     TRANSFER_RESERVATION("예약 송금", 8),
     QUIT("종료", 9);
 

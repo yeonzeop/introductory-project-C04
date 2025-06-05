@@ -235,13 +235,21 @@ public class MemberService {
     }
 
     private SavingsType selectDepositProduct(Scanner scanner) {
-        System.out.println("적금 상품을 선택해주세요.");
-        System.out.println("1. 단기 (이율 2.0%, 중도해지 이율 0.1%)");
-        System.out.println("2. 중기 (이율 3.0%, 중도해지 이율 0.5%)");
-        System.out.println("3. 장기 (이율 4.0%, 중도해지 이율 1.0%)");
-
+        System.out.println("BanKU: --------------------------------------------------------------------------");
+        System.out.println("                                적금        상품        종류                        ");
+        System.out.println("      ---------------------------------------------------------------------------");
+        System.out.println("      +------------------------+--------------------------+---------------------+");
+        System.out.println("      |         상   품         |         약 정 금 리        |    중도 해지 시 금리     ");
+        System.out.println("      +------------------------+--------------------------+---------------------+");
+        System.out.println("      |  1) 자유 적금 - 06개월    |           2.0%           |         1.0%           ");
+        System.out.println("      +------------------------+--------------------------+---------------------+");
+        System.out.println("      |  2) 자유 적금 - 12개월    |           3.0%           |         0.5%           ");
+        System.out.println("      +------------------------+--------------------------+---------------------+");
+        System.out.println("      |  3) 자유 적금 - 18개월    |           4.0%           |         0.1%           ");
+        System.out.println("      +------------------------+--------------------------+---------------------+");
+        System.out.println();
         while (true) {
-            System.out.print("상품 번호 (1~3) > ");
+            System.out.print("BanKU: 가입을 원하는 상품 번호를 입력해주세요(1~3 사이의 숫자) > ");
             String input = scanner.nextLine().trim();
             switch (input) {
                 case "1":
