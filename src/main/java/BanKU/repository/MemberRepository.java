@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -217,11 +216,11 @@ public class MemberRepository {
         }
     }
 
-    public void freeAccountInterest(long diffMonths){
+    public void freeAccountInterest(long diffMonths) {
         double interestRate = 0.1;
-        for(Account account: accounts.values()){
-            if(account.isActive()){
-                long interest = (long)Math.ceil(account.getBalance() * ( diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
+        for (Account account : accounts.values()) {
+            if (account.isActive()) {
+                long interest = (long) Math.ceil(account.getBalance() * (diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
                 account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
             }
         }
