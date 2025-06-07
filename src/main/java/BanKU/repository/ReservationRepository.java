@@ -62,8 +62,8 @@ public class ReservationRepository {
                             reservation.getTransferDate(),
                             TransactionType.WITHDRAWAL, reservation.getReceiverAccountNumber(),
                             reservation.getAmount(), reservation.getMemo());
-                    reservedDeposit.applyToAccounts(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()));
                     reservedWithdrawal.applyToAccounts(memberRepository.findAccountByNumber(reservation.getSenderAccountNumber()));
+                    reservedDeposit.applyToAccounts(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()));
                     transactionRepository.save(reservedDeposit);
                     transactionRepository.save(reservedWithdrawal);
                 } else {
