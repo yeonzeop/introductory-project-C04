@@ -62,8 +62,8 @@ public class ReservationRepository {
                             reservation.getTransferDate(),
                             TransactionType.WITHDRAWAL, reservation.getReceiverAccountNumber(),
                             reservation.getAmount(), reservation.getMemo());
-                    reservedDeposit.applyToAccounts(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()));
                     reservedWithdrawal.applyToAccounts(memberRepository.findAccountByNumber(reservation.getSenderAccountNumber()));
+                    reservedDeposit.applyToAccounts(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()));
                     transactionRepository.save(reservedDeposit);
                     transactionRepository.save(reservedWithdrawal);
                 } else {
@@ -83,10 +83,14 @@ public class ReservationRepository {
         str += reservation.getSenderAccountNumber() + "|";
         str += reservation.getTransferDate().format(formatter) + "|";
         str += reservation.getReceiverAccountNumber() + "|";
-        if (!reservation.getMemo().equals("")) {
-            str += reservation.getAmount() + "|";
-            str += reservation.getMemo();
-        } else {
+        try{
+            if (reservation.getMemo()!=null||!reservation.getMemo().equals("")) {
+                str += reservation.getAmount() + "|";
+                str += reservation.getMemo();
+            } else {
+                str += reservation.getAmount();
+            }
+        }catch(NullPointerException e){
             str += reservation.getAmount();
         }
         return str;
