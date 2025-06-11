@@ -44,8 +44,8 @@ public class SavingAccount extends Account {
         }
     }
 
-    public double getRate() {
-        return rate;
+    public double getRate(LocalDate nowDate) {
+        return !nowDate.isBefore(endDay) ? rate : earlyRate;
     }
 
     public double getEarlyRate() {
@@ -54,9 +54,7 @@ public class SavingAccount extends Account {
 
     public long computeInterest(LocalDate nowDate, List<Transaction> transactions) {
         long totalDeposited = computeTotalDeposited(transactions);
-        boolean isMature = !nowDate.isBefore(endDay);
-        double applicableRate = isMature ? getRate() : getEarlyRate();
-        return (long) Math.ceil(totalDeposited * applicableRate);
+        return (long) Math.ceil(totalDeposited * getRate(nowDate));
     }
 
     public long computeTotalDeposited(List<Transaction> transactions) {

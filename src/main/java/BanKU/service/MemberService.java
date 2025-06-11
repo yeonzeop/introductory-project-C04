@@ -206,7 +206,7 @@ public class MemberService {
                 productName
         );
         System.out.printf("       적용 금리: %.1f%%%30s잔액(단위: 원):     %,d원%n",
-                savingAccount.getRate() * 100,
+                savingAccount.getRate(nowDate) * 100,
                 "",
                 (int) savingAccount.getBalance()
         );
@@ -326,7 +326,7 @@ public class MemberService {
         System.out.println("       ---------------------------------------------------------------------------");
         System.out.printf("       납부 금액(단위: 원): %,d원 %n", totalDeposited);
         System.out.printf("       적용 금리: %.1f%%%30s이자(단위: 원):     %,d원%n",
-                savingAccount.getRate() * 100,
+                savingAccount.getRate(nowDate) * 100,
                 "",
                 interest);
         System.out.printf("       실수령액: %,d원%n", totalAmount);
