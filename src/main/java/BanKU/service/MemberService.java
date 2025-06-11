@@ -264,8 +264,9 @@ public class MemberService {
                 totalAmount,
                 "적금계좌 잔액 송금"
         );
+
+//        System.out.println("[closeDepositAccount LOG] 새로추가한 거래내역 = "+transaction);
         transaction.applyToAccounts(receivingAccount);
-        System.out.println("[closeDepositAccount LOG] 적금금액을 받은 계좌 = " + receivingAccount.getAccountNumber() + ", 잔액 = "+receivingAccount.getBalance());
         try {
             transactionRepository.save(transaction);
         } catch (IOException e) {

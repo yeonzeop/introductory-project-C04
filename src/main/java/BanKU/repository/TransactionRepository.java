@@ -84,7 +84,7 @@ public class TransactionRepository {
 
 
     public void save(Transaction transaction) throws IOException {
-        System.out.println("[save LOG] 거래내역 파일에 저장 = "+ transaction.toString());
+//        System.out.println("[save LOG] 거래내역 파일에 저장 = "+ transaction.toString());
         Path path = Paths.get(TRANSACTION_FILE_PATH);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         String str = getString(transaction, formatter);
