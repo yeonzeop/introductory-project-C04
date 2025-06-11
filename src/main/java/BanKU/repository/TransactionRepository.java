@@ -64,9 +64,9 @@ public class TransactionRepository {
                 .getDate()
                 .isAfter(transaction.getDate());
         if (!isValidDate) {
-            System.out.println();
-            System.out.println("직전 거래내역 날짜 = " + transactions.get(transactions.size() - 1).getDate());
-            System.out.println("현재 거래내역 날짜 = " + transaction.getDate());
+//            System.out.println();
+//            System.out.println("직전 거래내역 날짜 = " + transactions.get(transactions.size() - 1).getDate());
+//            System.out.println("현재 거래내역 날짜 = " + transaction.getDate());
             throw new IllegalArgumentException("[WARNING] 거래내역 데이터에 손실이 있습니다. 해당 행을 무시합니다. 날짜: " + transaction.getDate());
         }
     }
@@ -120,6 +120,10 @@ public class TransactionRepository {
                 try {
                     String[] strings = line.split("\\|");
                     Transaction transaction = Transaction.from(strings);
+                    Account savingAccount = memberRepository.findAccountByNumber((transaction.getSenderAccountNumber()));
+                    if (! (savingAccount instanceof SavingAccount)) {
+                        throw new IllegalArgumentException("[WARNING] 적금 거래내역 파일의 입금은 적금 계좌에 한해 허용됩니다. 해당 조건을 만족하지 않는 거래 내역은 자동으로 비활성화됩니다.");
+                    }
                     validateDate(savingTransactions, transaction);
                     validateTransaction(transaction);
                     validSavingTransactionLines.add(line);

@@ -184,7 +184,7 @@ public class MemberRepository {
     public Account findAccountByNumber(String accountNumber) {
         Account account = accounts.get(accountNumber);
         if (account == null || (!(account instanceof SavingAccount) && !account.isActive())) {
-            System.out.println("[findAccountByNumber LOG] 계좌번호 = " + accountNumber + ", 적금계좌인가? " + (account instanceof SavingAccount));
+//            System.out.println("[findAccountByNumber LOG] 계좌번호 = " + accountNumber + ", 적금계좌인가? " + (account instanceof SavingAccount));
             throw new IllegalArgumentException("[WARNING] 비활성화 계좌의 계좌번호, 혹은 존재하지 않는 계좌 번호로 인하여 누락된 거래 내역이 있습니다.");
         }
         return account;
