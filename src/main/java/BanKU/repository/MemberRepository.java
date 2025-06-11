@@ -15,10 +15,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static BanKU.Main.DEPOSIT_INFO_FILE_PATH;
 import static BanKU.Main.USER_FILE_PATH;
@@ -96,7 +93,6 @@ public class MemberRepository {
     }
 
     public void saveMember(Member member) {
-        // TODO. 파일에 회원정보 저장 (추가하기)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         String newLine =
                 member.getLoginId().toLowerCase() + "|" +
@@ -196,10 +192,11 @@ public class MemberRepository {
                     .append(savingAccount.getStartDay().format(formatter)).append("|")
                     .append(savingAccount.getEndDay().format(formatter)).append("|")
                     .append(savingAccount.isClosed() ? "closed" : "opened");
-//            System.out.println("[LOG] 적금계좌 저장 형태 = " + sb.toString());
+            System.out.println("[saveSavingsAccount LOG] 적금계좌 저장 형태 = " + sb.toString());
             writer.write(sb.toString());
             writer.newLine();
             accounts.put(savingAccount.getAccountNumber(), savingAccount);
+            System.out.println("[saveSavingsAccount LOG] 새로 생성한 계좌 = "+ savingAccount.toString());
         } catch (IOException e) {
             System.out.println("[ERROR] 적금 계좌 정보를 파일에 저장하는 데 실패했습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
@@ -211,12 +208,17 @@ public class MemberRepository {
 
         try {
             List<String> lines = Files.readAllLines(path);
-            List<String> updatedLines = lines.stream()
-                    .filter(line -> !line.contains(account.getAccountNumber()))
-                    .toList();
-            Files.write(path, updatedLines);
-            saveSavingsAccount(member, account);
+            List<String> updatedLines = new ArrayList<>();
 
+            for (String line : lines) {
+                if (line.contains(account.getAccountNumber()) && line.endsWith("|opened")) {
+                    updatedLines.add(line.replace("|opened", "|closed"));
+                } else {
+                    updatedLines.add(line);
+                }
+            }
+
+            Files.write(path, updatedLines);
         } catch (IOException e) {
             System.out.println("[ERROR] 적금 계좌 정보를 파일을 변경하는 데 실패했습니다.");
         }
@@ -279,4 +281,5 @@ public class MemberRepository {
             System.out.println("[ERROR] 적금 계좌 상태를 'closed'로 변경하는 데 실패했습니다.");
         }
     }
+
 }

@@ -90,9 +90,13 @@ public class Member {
     }
 
     public void addAccount(Account account) {
-        if (accounts.size() <= 3) {
+        if (accounts.size() <= 4) {
             accounts.add(account);
         }
+    }
+
+    public void removeAccount(String accountNumber) {
+        accounts.removeIf(account -> account.getAccountNumber().equals(accountNumber));
     }
 
     public boolean hasSavingAccount() {
