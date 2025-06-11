@@ -145,6 +145,16 @@ public class TransactionRepository {
         return result;
     }
 
+    public List<Transaction> findTransactionByAccount(SavingAccount savingAccount) {
+        List<Transaction> result = new ArrayList<>();
+        for (Transaction transaction : savingTransactions) {
+            if (transaction.getSenderAccountNumber().equals(savingAccount.getAccountNumber())) {
+                result.add(transaction);
+            }
+        }
+        return result;
+    }
+
     // TODO. 적금 계좌로 송금 시 추가 (memberService.transfer 메서드에서 적금 계좌인 경우 사용하도록 구현해야됨)
     public void saveDeposit(Transaction transaction) throws IOException {
         Path path = Paths.get(DEPOSIT_TRANSACTION_FILE_PATH);
