@@ -73,7 +73,6 @@ public class TransactionRepository {
 
     private void validateTransaction(Transaction transaction) throws IllegalArgumentException {
         Account senderAccount = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
-        Account receiverAccount = memberRepository.findAccountByNumber(transaction.getReceiverAccountNumber());
 
         try {
             transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
@@ -180,7 +179,6 @@ public class TransactionRepository {
     }
 
     private void makeInterest(List<Transaction> regularTransactions, Transaction transaction) {
-        Account senderAccount = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
         if (!regularTransactions.isEmpty()) {
             long diffMonths = ChronoUnit.MONTHS.between(regularTransactions.get(regularTransactions.size() - 1).getDate(), transaction.getDate());
             System.out.println(" 거래날짜로 인해 diffMonths=" + diffMonths);
