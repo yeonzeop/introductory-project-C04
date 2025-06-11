@@ -180,8 +180,11 @@ public class TransactionRepository {
 
     private void makeInterest(List<Transaction> regularTransactions, Transaction transaction) {
         if (!regularTransactions.isEmpty()) {
-            long diffMonths = ChronoUnit.MONTHS.between(regularTransactions.get(regularTransactions.size() - 1).getDate(), transaction.getDate());
-            System.out.println(" 거래날짜로 인해 diffMonths=" + diffMonths);
+            LocalDate last = regularTransactions.get(regularTransactions.size() - 1).getDate();
+            LocalDate current = transaction.getDate();
+            LocalDate lastStd = LocalDate.of(last.getYear(),last.getMonth(),1);
+            LocalDate currentStd = LocalDate.of(current.getYear(),current.getMonth(),1);
+            long diffMonths = ChronoUnit.MONTHS.between(lastStd,currentStd);
             if (diffMonths > 0) {
                 memberRepository.freeAccountInterest(diffMonths);
             }
