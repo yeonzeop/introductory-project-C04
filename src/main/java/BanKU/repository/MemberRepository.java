@@ -58,8 +58,10 @@ public class MemberRepository {
                 .forEach(entry -> {
                     try {
                         Member member = findMemberByLoginId(entry.getKey().trim());
-                        member.setHasSavingAccount(true);
                         SavingAccount savingAccount = entry.getValue();
+                        if (!savingAccount.isClosed()) {
+                            member.setHasSavingAccount(true);
+                        }
                         accounts.put(savingAccount.getAccountNumber(), savingAccount);
                         member.addAccount(savingAccount);
                     } catch (IllegalArgumentException e) {
