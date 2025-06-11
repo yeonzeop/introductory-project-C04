@@ -90,7 +90,10 @@ public class Member {
     }
 
     public void addAccount(Account account) {
-        if (accounts.size() <= 4) {
+        long count = accounts.stream()
+                .filter(Account::isActive)
+                .count();
+        if (count <= 3 || !account.isActive()) {
             accounts.add(account);
         }
     }

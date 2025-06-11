@@ -63,6 +63,7 @@ public class MemberRepository {
                             savingAccount.deactivate();
                             member.setHasSavingAccount(false);
                         }
+                        member.addAccount(savingAccount);
                         accounts.put(savingAccount.getAccountNumber(), savingAccount);
                         member.addAccount(savingAccount);
                     } catch (IllegalArgumentException e) {
@@ -175,13 +176,13 @@ public class MemberRepository {
 
 
     // 로깅용 임시 메서드
-    public void printAccounts() {
-        System.out.println("[printAccounts]");
-        for (Account account : accounts.values()) {
-            System.out.println(account.toString());
-        }
-        System.out.println();
-    }
+//    public void printAccounts() {
+//        System.out.println("[printAccounts]");
+//        for (Account account : accounts.values()) {
+//            System.out.println(account.toString());
+//        }
+//        System.out.println();
+//    }
 
     public void saveSavingsAccount(Member member, SavingAccount savingAccount) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");

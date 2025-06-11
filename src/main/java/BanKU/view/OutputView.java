@@ -28,7 +28,10 @@ public class OutputView {
         System.out.println("       |        계좌 번호         |           잔 액            |");
         System.out.println("       +------------------------+--------------------------+");
 
+
         for (Account account : accounts) {
+            if (!account.isActive()) continue;      // 비활성 계좌는 건너뜀
+
             String accountNumber = centerAlign(account.getAccountNumber(), 22);
             String balanceStr = String.format("%,d원", account.getBalance());
             balanceStr = centerAlign(balanceStr, 24);
