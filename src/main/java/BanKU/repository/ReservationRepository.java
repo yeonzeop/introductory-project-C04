@@ -1,6 +1,7 @@
 package BanKU.repository;
 
 import BanKU.domain.Reservation;
+import BanKU.domain.SavingAccount;
 import BanKU.domain.Transaction;
 import BanKU.enums.TransactionType;
 
@@ -64,7 +65,11 @@ public class ReservationRepository {
                             reservation.getAmount(), reservation.getMemo());
                     reservedWithdrawal.applyToAccounts(memberRepository.findAccountByNumber(reservation.getSenderAccountNumber()));
                     reservedDeposit.applyToAccounts(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()));
-                    transactionRepository.save(reservedDeposit);
+                    if(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()) instanceof SavingAccount){
+                        transactionRepository.saveDeposit(reservedDeposit);
+                    }else{
+                        transactionRepository.save(reservedDeposit);
+                    }
                     transactionRepository.save(reservedWithdrawal);
                 } else {
                     String str = getLine(reservation);
