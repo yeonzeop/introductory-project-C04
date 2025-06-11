@@ -230,7 +230,6 @@ public class MemberService {
 
         List<Account> regularAccounts = member.getAccounts().stream()
                 .filter(account -> !(account instanceof SavingAccount) &&
-                        account.isActive() &&
                         account.canAcceptAmount(totalAmount))
                 .toList();
 
@@ -339,15 +338,18 @@ public class MemberService {
                 System.out.println("BanKU: 계좌 번호는 -없이 숫자로만 입력가능합니다. 다시 입력해주세요.\n");
                 continue;
             }
+            boolean found = false;
             for (Account account : regularAccounts) {
-                if (!account.isActive()) {
-                    System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다.\n");
-                    continue;
-                }
                 if (account.getAccountNumber().equals(rawAccountNumber)) {
+                    found = true;
+                    if (!account.isActive()) {
+                        System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다.");
+                        break;
+                    }
                     return account;
                 }
             }
+            if (found) continue;
             System.out.println("BanKU: 본인 명의가 아닌 계좌로는 수령할 수 없습니다.");
         }
     }
