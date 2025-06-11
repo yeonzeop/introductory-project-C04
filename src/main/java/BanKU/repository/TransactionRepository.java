@@ -98,12 +98,16 @@ public class TransactionRepository {
         str += transaction.getDate().format(formatter) + "|";
         str += transaction.getType().toString() + "|";
         str += transaction.getReceiverAccountNumber() + "|";
+        try{
         if (!transaction.getMemo().equals("")) {
             str += transaction.getAmount() + "|";
             str += transaction.getMemo();
         } else {
             str += transaction.getAmount();
+        }}catch(NullPointerException e){
+            str += transaction.getAmount();
         }
+
         return str;
     }
 
