@@ -239,7 +239,10 @@ public class MemberService {
                         account.canAcceptAmount(totalAmount))
                 .toList();
 
-        if (regularAccounts.isEmpty()) {
+        boolean canReceive = regularAccounts.stream()
+                .anyMatch(account -> account.canAcceptAmount(totalAmount));
+
+        if (regularAccounts.isEmpty() || !canReceive) {
             savingAccount.deactivate();
             savingAccount.setClosed();
             memberRepository.closeAccount(savingAccount);
@@ -249,7 +252,12 @@ public class MemberService {
             return;
         }
 
+
         Account receivingAccount = chooseReceivingAccount(scanner, nowDate, savingAccount, regularAccounts);
+//        if (!receivingAccount.canAcceptAmount(totalAmount)) {
+//            System.out.println("해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.");
+//        }
+
         while(true) {
             System.out.print("BanKU: 계좌 비밀번호를 입력해주세요(숫자 4자리로 입력해주세요) > ");
             String rawPassword = scanner.nextLine().trim();
@@ -343,19 +351,20 @@ public class MemberService {
                 System.out.println("BanKU: 계좌 번호는 -없이 숫자로만 입력가능합니다. 다시 입력해주세요.");
                 continue;
             }
-            boolean found = false;
-            for (Account account : regularAccounts) {
-                if (account.getAccountNumber().equals(rawAccountNumber)) {
-                    found = true;
-                    if (!account.isActive()) {
-                        System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다.");
-                        break;
-                    }
-                    return account;
+
+            Account account = memberRepository.findAccountByNumber(rawAccountNumber);
+            if (account == null) {
+                System.out.println("BanKU: 본인 명의가 아닌 계좌로는 수령할 수 없습니다.");
+                continue;
+            }
+            if (regularAccounts.contains(account)) {
+                if (!account.isActive()) {
+                    System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다.");
+                    continue;
                 }
             }
-            if (found) continue;
             System.out.println("BanKU: 본인 명의가 아닌 계좌로는 수령할 수 없습니다.");
+
         }
     }
 }
