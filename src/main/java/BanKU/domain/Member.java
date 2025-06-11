@@ -14,7 +14,6 @@ public class Member {
     private final LocalDate birthday;
     private String phoneNumber;
     private List<Account> accounts;
-    private boolean hasSavingAccount = true;
 
     public Member(String loginId, String password, String name, LocalDate birthday, String phoneNumber, List<Account> accounts) {
         this.loginId = loginId;

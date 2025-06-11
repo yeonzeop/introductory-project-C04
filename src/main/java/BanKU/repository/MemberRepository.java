@@ -49,6 +49,9 @@ public class MemberRepository {
 
     private void loadSavingsFile() throws IOException {
         Path path = Paths.get(DEPOSIT_INFO_FILE_PATH);
+        validateSavingsFile(path);      // 잘못된 부분이 있으면 수정
+
+        // 수정된 파일을 다시 읽어 로드
         Files.lines(path)
                 .map(String::trim)
                 .filter(line -> !line.isEmpty())
@@ -61,15 +64,40 @@ public class MemberRepository {
                         SavingAccount savingAccount = entry.getValue();
                         if (savingAccount.isClosed()) {
                             savingAccount.deactivate();
-//                            member.setHasSavingAccount(false);
                         }
                         member.addAccount(savingAccount);
                         accounts.put(savingAccount.getAccountNumber(), savingAccount);
-                        member.addAccount(savingAccount);
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
                     }
                 });
+    }
+
+    private void validateSavingsFile(Path path) throws IOException {
+        Map<String, Boolean> hasOpenedAccount = new HashMap<>();     // 사용자별 opened 계좌가 하나만 있도록 하기 위한 상태 추적용 Map
+        List<String> lines = Files.readAllLines(path);
+
+        for (String line : lines) {
+            String trimmedLine = line.trim();
+            if (trimmedLine.isEmpty()) continue;
+
+            String[] tokens = trimmedLine.split("\\|");
+            String userId = tokens[0];
+            String status = tokens[5];
+
+            // 사용자별로 이미 opened 계좌가 있는지 확인
+            boolean alreadyOpened = hasOpenedAccount.getOrDefault(userId, false);
+
+            // opened 계좌가 1개 이상이면 강제로 closed 처리
+            if ("opened".equalsIgnoreCase(status)) {
+                if (!alreadyOpened) {
+                    hasOpenedAccount.put(userId, true);
+                } else {
+                    System.out.println("[ERROR] 적금 계좌는 사용자당 1개까지만 허용됩니다. 중복된 계좌가 확인되어 프로그램을 종료합니다.");
+                    System.exit(1);
+                }
+            }
+        }
     }
 
 
@@ -176,13 +204,13 @@ public class MemberRepository {
 
 
     // 로깅용 임시 메서드
-//    public void printAccounts() {
-//        System.out.println("[printAccounts]");
-//        for (Account account : accounts.values()) {
-//            System.out.println(account.toString());
-//        }
-//        System.out.println();
-//    }
+    public void printAccounts() {
+        System.out.println("[printAccounts]");
+        for (Account account : accounts.values()) {
+            System.out.println(account.toString());
+        }
+        System.out.println();
+    }
 
     public void saveSavingsAccount(Member member, SavingAccount savingAccount) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
@@ -198,7 +226,7 @@ public class MemberRepository {
             writer.write(sb.toString());
             writer.newLine();
             accounts.put(savingAccount.getAccountNumber(), savingAccount);
-            System.out.println("[saveSavingsAccount LOG] 새로 생성한 계좌 = "+ savingAccount.toString());
+            System.out.println("[saveSavingsAccount LOG] 새로 생성한 계좌 = " + savingAccount.toString());
         } catch (IOException e) {
             System.out.println("[ERROR] 적금 계좌 정보를 파일에 저장하는 데 실패했습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
@@ -233,9 +261,9 @@ public class MemberRepository {
                 long interest = (long) Math.ceil(account.getBalance() * (diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
                 // 확인용 출력
 //                System.out.println("이자: " + interest);
-                try{
+                try {
                     account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
-                }catch(IllegalArgumentException e){
+                } catch (IllegalArgumentException e) {
                     account.deactivate(); // 막아주기만 하고 비활성화는 안 시ㅋㅕ줬엇네 ㅋㅋ
                     System.out.println(e.getMessage());
                 }
@@ -243,22 +271,22 @@ public class MemberRepository {
         }
     }
 
-    public void freeAccountInterestForDate(LocalDate now,TransactionRepository tr){
+    public void freeAccountInterestForDate(LocalDate now, TransactionRepository tr) {
         double interestRate = 0.1;
         for (Account account : accounts.values()) {
             if (account.isActive() && !(account instanceof SavingAccount)) {
                 List<Transaction> trs = tr.findTransactionByAccount(account);
-                if(!trs.isEmpty()){
-                    LocalDate last = trs.get(trs.size()-1).getDate();
-                    LocalDate nowStd = LocalDate.of(now.getYear(), now.getMonth(),1);
-                    LocalDate lastStd = LocalDate.of(last.getYear(), last.getMonth(),1);
-                    long diffMonths = ChronoUnit.MONTHS.between(lastStd,nowStd);
+                if (!trs.isEmpty()) {
+                    LocalDate last = trs.get(trs.size() - 1).getDate();
+                    LocalDate nowStd = LocalDate.of(now.getYear(), now.getMonth(), 1);
+                    LocalDate lastStd = LocalDate.of(last.getYear(), last.getMonth(), 1);
+                    long diffMonths = ChronoUnit.MONTHS.between(lastStd, nowStd);
                     long interest = (long) Math.ceil(account.getBalance() * (diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
                     // 확인용 출력
 //                System.out.println("이자: " + interest);
-                    try{
+                    try {
                         account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
-                    }catch(IllegalArgumentException e){
+                    } catch (IllegalArgumentException e) {
                         account.deactivate(); // 막아주기만 하고 비활성화는 안 시ㅋㅕ줬엇네 ㅋㅋ
                         System.out.println(e.getMessage());
                     }
