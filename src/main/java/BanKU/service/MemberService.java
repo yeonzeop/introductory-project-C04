@@ -252,7 +252,8 @@ public class MemberService {
                 if (savingAccount.getPassword().equals(rawPassword)){
                     break;
                 }
-                System.out.println("[ERROR] 올바른 비밀번호가 아닙니다. 다시 한번 비밀번호를 입력해주세요.");
+                System.out.println("[ERROR] 올바른 비밀번호가 아닙니다. 다시 한 번 비밀번호를 입력해주세요.");
+                continue;
             }
             System.out.println("[ERROR] 계좌 비밀번호는 숫자로만 입력가능합니다. 다시 한번 비밀번호를 입력해주세요.");
         }
@@ -339,6 +340,10 @@ public class MemberService {
                 continue;
             }
             for (Account account : regularAccounts) {
+                if (!account.isActive()) {
+                    System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다.\n");
+                    continue;
+                }
                 if (account.getAccountNumber().equals(rawAccountNumber)) {
                     return account;
                 }
