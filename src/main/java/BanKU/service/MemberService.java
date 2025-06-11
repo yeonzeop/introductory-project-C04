@@ -223,10 +223,10 @@ public class MemberService {
         }
 
         List<Transaction> transactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
+
         long interest = savingAccount.computeInterest(nowDate, transactions);
         long totalDeposited = savingAccount.computeTotalDeposited(transactions);
         long totalAmount = interest + totalDeposited;
-
 
         List<Account> regularAccounts = member.getAccounts().stream()
                 .filter(account -> !(account instanceof SavingAccount) &&
@@ -256,16 +256,18 @@ public class MemberService {
             }
             System.out.println("[ERROR] 계좌 비밀번호는 숫자로만 입력가능합니다. 다시 한번 비밀번호를 입력해주세요.");
         }
-        receivingAccount.plus(totalAmount);
+        Transaction transaction = new Transaction(
+                receivingAccount.getAccountNumber(),
+                nowDate,
+                DEPOSIT,
+                savingAccount.getAccountNumber(),
+                totalAmount,
+                "적금계좌 잔액 송금"
+        );
+        transaction.applyToAccounts(receivingAccount);
+        System.out.println("[closeDepositAccount LOG] 적금금액을 받은 계좌 = " + receivingAccount.getAccountNumber() + ", 잔액 = "+receivingAccount.getBalance());
         try {
-            transactionRepository.save(new Transaction(
-                    savingAccount.getAccountNumber(),
-                    nowDate,
-                    DEPOSIT,
-                    receivingAccount.getAccountNumber(),
-                    totalAmount,
-                    "적금계좌 잔액 송금"
-            ));
+            transactionRepository.save(transaction);
         } catch (IOException e) {
             System.out.println("[ERROR] transaction.txt 파일에 저장할 수 없습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());

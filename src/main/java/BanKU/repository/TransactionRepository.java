@@ -71,11 +71,17 @@ public class TransactionRepository {
     }
 
     private void validateTransaction(List<Transaction> regularTransactions, Transaction transaction) throws IllegalArgumentException {
+
         Account senderAccount = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
         Account receiverAccount = memberRepository.findAccountByNumber(transaction.getReceiverAccountNumber());
 
         try {
+            System.out.println("[validateTransaction LOG] transaction = " + transaction);
+
             transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
+            System.out.println("[validateTransaction LOG] senderAccount = " + senderAccount);
+            System.out.println("[validateTransaction LOG] receiverAccount = " + receiverAccount);
+            System.out.println();
             if(!regularTransactions.isEmpty()) {
                 long diffMonths = ChronoUnit.MONTHS.between(regularTransactions.get(regularTransactions.size() - 1).getDate(),transaction.getDate());
                 if (diffMonths > 0) {
@@ -90,6 +96,7 @@ public class TransactionRepository {
 
 
     public void save(Transaction transaction) throws IOException {
+        System.out.println("[save LOG] 거래내역 파일에 저장 = "+ transaction.toString());
         Path path = Paths.get(TRANSACTION_FILE_PATH);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         String str = getString(transaction, formatter);
