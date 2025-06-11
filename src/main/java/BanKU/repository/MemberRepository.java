@@ -244,18 +244,20 @@ public class MemberRepository {
         for (Account account : accounts.values()) {
             if (account.isActive() && !(account instanceof SavingAccount)) {
                 List<Transaction> trs = tr.findTransactionByAccount(account);
-                LocalDate last = trs.get(trs.size()-1).getDate();
-                LocalDate nowStd = LocalDate.of(now.getYear(), now.getMonth(),1);
-                LocalDate lastStd = LocalDate.of(last.getYear(), last.getMonth(),1);
-                long diffMonths = ChronoUnit.MONTHS.between(lastStd,nowStd);
-                long interest = (long) Math.ceil(account.getBalance() * (diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
-                // 확인용 출력
+                if(!trs.isEmpty()){
+                    LocalDate last = trs.get(trs.size()-1).getDate();
+                    LocalDate nowStd = LocalDate.of(now.getYear(), now.getMonth(),1);
+                    LocalDate lastStd = LocalDate.of(last.getYear(), last.getMonth(),1);
+                    long diffMonths = ChronoUnit.MONTHS.between(lastStd,nowStd);
+                    long interest = (long) Math.ceil(account.getBalance() * (diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
+                    // 확인용 출력
 //                System.out.println("이자: " + interest);
-                try{
-                    account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
-                }catch(IllegalArgumentException e){
-                    account.deactivate(); // 막아주기만 하고 비활성화는 안 시ㅋㅕ줬엇네 ㅋㅋ
-                    System.out.println(e.getMessage());
+                    try{
+                        account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
+                    }catch(IllegalArgumentException e){
+                        account.deactivate(); // 막아주기만 하고 비활성화는 안 시ㅋㅕ줬엇네 ㅋㅋ
+                        System.out.println(e.getMessage());
+                    }
                 }
             }
         }
