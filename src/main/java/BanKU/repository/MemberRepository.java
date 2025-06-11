@@ -59,8 +59,9 @@ public class MemberRepository {
                     try {
                         Member member = findMemberByLoginId(entry.getKey().trim());
                         SavingAccount savingAccount = entry.getValue();
-                        if (!savingAccount.isClosed()) {
-                            member.setHasSavingAccount(true);
+                        if (savingAccount.isClosed()) {
+                            savingAccount.deactivate();
+                            member.setHasSavingAccount(false);
                         }
                         accounts.put(savingAccount.getAccountNumber(), savingAccount);
                         member.addAccount(savingAccount);
@@ -174,13 +175,13 @@ public class MemberRepository {
 
 
     // 로깅용 임시 메서드
-//    public void printAccounts() {
-//        System.out.println("[printAccounts]");
-//        for (Account account : accounts.values()) {
-//            System.out.println(account.toString());
-//        }
-//        System.out.println();
-//    }
+    public void printAccounts() {
+        System.out.println("[printAccounts]");
+        for (Account account : accounts.values()) {
+            System.out.println(account.toString());
+        }
+        System.out.println();
+    }
 
     public void saveSavingsAccount(Member member, SavingAccount savingAccount) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");

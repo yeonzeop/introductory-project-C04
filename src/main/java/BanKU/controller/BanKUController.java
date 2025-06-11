@@ -24,9 +24,9 @@ public class BanKUController {
     private final AccountService accountService;
     private final MemberService memberService;
 
-    public BanKUController(DateRepository dateRepository, MemberRepository memberRepository, TransactionRepository transactionRepository,ReservationRepository reservationRepository) {
+    public BanKUController(DateRepository dateRepository, MemberRepository memberRepository, TransactionRepository transactionRepository, ReservationRepository reservationRepository) {
         this.dateService = new DateService(dateRepository);
-        this.accountService = new AccountService(memberRepository, transactionRepository,reservationRepository);
+        this.accountService = new AccountService(memberRepository, transactionRepository, reservationRepository);
         this.memberService = new MemberService(memberRepository, transactionRepository);
     }
 
@@ -50,7 +50,10 @@ public class BanKUController {
         }
 
         // 3. 계좌 선택 (신규 회원인 경우 계좌 생성으로 바로 넘어가기)
-        System.out.println("BanKU: 현재 사용자 명의로 된 계좌는 " + member.getAccounts().size() + "개 있습니다.");
+        int accountNum = (int) member.getAccounts().stream()
+                .filter(Account::isActive)
+                .count();
+        System.out.println("BanKU: 현재 사용자 명의로 된 계좌는 " + accountNum + "개 있습니다.");
         Account account = accountService.choose(member, scanner);
 
         // 4. 메인메뉴로 나옴
@@ -79,7 +82,7 @@ public class BanKUController {
                 case ACCOUNT_CREATION -> memberService.createAccount(nowDate, member, scanner);
                 case SAVING_ACCOUNT_CREATION -> memberService.createDepositAccount(nowDate, member, scanner);
                 case SAVING_ACCOUNT_CLOSED -> memberService.closeDepositAccount(nowDate, member, scanner);
-                case TRANSFER_RESERVATION -> accountService.transferReserve(account,scanner);
+                case TRANSFER_RESERVATION -> accountService.transferReserve(account, scanner);
                 case QUIT -> {
                     if (quit(scanner)) {
                         return;

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static BanKU.enums.TransactionType.*;
 import static BanKU.utils.DateValidator.validateDate;
@@ -31,7 +32,9 @@ public class AccountService {
     }
 
     public Account choose(Member member, Scanner scanner) {
-        List<Account> regularAccounts = member.getRegularAccounts();
+        List<Account> regularAccounts = member.getRegularAccounts().stream()
+                .filter(Account::isActive)
+                .collect(Collectors.toList());
         System.out.println("[" + member.getName() + "]님의 사용가능한 계좌 목록");
         OutputView.showAccounts(regularAccounts);
         return InputView.chooseAccount(regularAccounts, scanner);
