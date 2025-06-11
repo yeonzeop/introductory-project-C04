@@ -116,7 +116,7 @@ public class ReservationRepository {
             transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
         } catch (IllegalArgumentException e) {
             senderAccount.deactivate();
-            System.out.println(e.getMessage());
+            throw e;
         }
     }
 }
