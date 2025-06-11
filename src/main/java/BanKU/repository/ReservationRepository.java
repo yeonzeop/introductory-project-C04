@@ -1,5 +1,6 @@
 package BanKU.repository;
 
+import BanKU.domain.Account;
 import BanKU.domain.Reservation;
 import BanKU.domain.SavingAccount;
 import BanKU.domain.Transaction;
@@ -63,8 +64,8 @@ public class ReservationRepository {
                             reservation.getTransferDate(),
                             TransactionType.WITHDRAWAL, reservation.getReceiverAccountNumber(),
                             reservation.getAmount(), reservation.getMemo());
-                    reservedWithdrawal.applyToAccounts(memberRepository.findAccountByNumber(reservation.getSenderAccountNumber()));
-                    reservedDeposit.applyToAccounts(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()));
+                    validateTransaction(reservedWithdrawal);
+                    validateTransaction(reservedDeposit);
                     if(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()) instanceof SavingAccount){
                         transactionRepository.saveDeposit(reservedDeposit);
                     }else{
@@ -106,5 +107,16 @@ public class ReservationRepository {
         String str = getLine(reservation);
         validLines.add(str);
         Files.write(path, validLines);
+    }
+
+    private void validateTransaction(Transaction transaction) throws IllegalArgumentException {
+        Account senderAccount = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
+
+        try {
+            transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
+        } catch (IllegalArgumentException e) {
+            senderAccount.deactivate();
+            System.out.println(e.getMessage());
+        }
     }
 }
