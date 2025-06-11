@@ -24,8 +24,8 @@ public class Main {
         ReservationRepository reservationRepository = new ReservationRepository(transactionRepository, memberRepository);
 
 //        transactionRepository.printTransactions();
-        memberRepository.printAccounts();
-//        251025701407
+//        memberRepository.printAccounts();
+
         // 2. 메인 기능
         BanKUController banKUController = new BanKUController(dateRepository, memberRepository, transactionRepository, reservationRepository);
         banKUController.run();

@@ -3,9 +3,11 @@ package BanKU.domain;
 import BanKU.enums.SavingsType;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import static BanKU.enums.TransactionType.DEPOSIT;
 import static BanKU.utils.DateValidator.validateDate;
 import static BanKU.utils.MemberValidator.validateAccount;
 import static BanKU.utils.MemberValidator.validateLoginId;
@@ -53,8 +55,23 @@ public class SavingAccount extends Account {
     }
 
     public long computeInterest(LocalDate nowDate, List<Transaction> transactions) {
-        long totalDeposited = computeTotalDeposited(transactions);
-        return (long) Math.ceil(totalDeposited * getRate(nowDate));
+        double totalInterest = 0.0;
+
+        for (Transaction transaction : transactions) {
+            if (transaction.getType() != DEPOSIT) continue; // 입금만 계산 대상
+
+            long operatingDays = ChronoUnit.DAYS.between(transaction.getDate(), isClosed ? endDay : nowDate);
+            if (operatingDays < 0) continue; // 잘못된 날짜는 무시
+
+            double rateToApply = getRate(nowDate); // 조기해지 여부에 따라 적용 이율 결정
+
+            // 윤년인지에 따라 일수 기준 결정
+            int baseDays = Year.isLeap(nowDate.getYear()) ? 366 : 365;
+            double interest = transaction.getAmount() * rateToApply * ((double) operatingDays / baseDays);
+            totalInterest += interest;
+        }
+
+        return (long) Math.ceil(totalInterest); // 소수점 이하 올림
     }
 
     public long computeTotalDeposited(List<Transaction> transactions) {
