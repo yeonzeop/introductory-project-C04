@@ -4,6 +4,7 @@ package BanKU.repository;
 import BanKU.domain.Account;
 import BanKU.domain.Member;
 import BanKU.domain.SavingAccount;
+import BanKU.domain.Transaction;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -11,7 +12,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -223,6 +226,28 @@ public class MemberRepository {
         double interestRate = 0.1;
         for (Account account : accounts.values()) {
             if (account.isActive() && !(account instanceof SavingAccount)) {
+                long interest = (long) Math.ceil(account.getBalance() * (diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
+                // 확인용 출력
+//                System.out.println("이자: " + interest);
+                try{
+                    account.plus(interest); // 해당 메서드 안에서 오버플로우 막아줌!
+                }catch(IllegalArgumentException e){
+                    account.deactivate(); // 막아주기만 하고 비활성화는 안 시ㅋㅕ줬엇네 ㅋㅋ
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
+    }
+
+    public void freeAccountInterestForDate(LocalDate now,TransactionRepository tr){
+        double interestRate = 0.1;
+        for (Account account : accounts.values()) {
+            if (account.isActive() && !(account instanceof SavingAccount)) {
+                List<Transaction> trs = tr.findTransactionByAccount(account);
+                LocalDate last = trs.get(trs.size()-1).getDate();
+                LocalDate nowStd = LocalDate.of(now.getYear(), now.getMonth(),1);
+                LocalDate lastStd = LocalDate.of(last.getYear(), last.getMonth(),1);
+                long diffMonths = ChronoUnit.MONTHS.between(lastStd,nowStd);
                 long interest = (long) Math.ceil(account.getBalance() * (diffMonths * ((interestRate / 100) / 12))); // 소수 첫째자리에서 올림
                 // 확인용 출력
 //                System.out.println("이자: " + interest);
