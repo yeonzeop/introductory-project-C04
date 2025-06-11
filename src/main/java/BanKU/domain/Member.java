@@ -103,12 +103,13 @@ public class Member {
     }
 
     public boolean hasSavingAccount() {
-        return hasSavingAccount;
+        return accounts.stream()
+                .anyMatch(account -> (account instanceof SavingAccount) && account.isActive());
     }
 
-    public void setHasSavingAccount(boolean hasSavingAccount) {
-        this.hasSavingAccount = hasSavingAccount;
-    }
+//    public void setHasSavingAccount(boolean hasSavingAccount) {
+//        this.hasSavingAccount = hasSavingAccount;
+//    }
 
     public List<Account> getRegularAccounts() {
         return accounts.stream()

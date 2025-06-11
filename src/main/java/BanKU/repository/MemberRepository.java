@@ -61,7 +61,7 @@ public class MemberRepository {
                         SavingAccount savingAccount = entry.getValue();
                         if (savingAccount.isClosed()) {
                             savingAccount.deactivate();
-                            member.setHasSavingAccount(false);
+//                            member.setHasSavingAccount(false);
                         }
                         member.addAccount(savingAccount);
                         accounts.put(savingAccount.getAccountNumber(), savingAccount);

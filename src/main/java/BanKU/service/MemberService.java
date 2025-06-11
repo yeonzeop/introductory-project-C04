@@ -160,8 +160,6 @@ public class MemberService {
             System.out.println(account.toString());
         }
 
-
-        member.setHasSavingAccount(true);
         memberRepository.saveSavingsAccount(member, savingAccount);
         System.out.println("BanKU: 적금 계좌번호: " + accountNumber + "\nBanKU: 적금 계좌 생성이 완료되었습니다.");
     }
@@ -246,7 +244,6 @@ public class MemberService {
             savingAccount.setClosed();
             memberRepository.closeAccount(savingAccount);
             member.removeAccount(savingAccount.getAccountNumber());
-            member.setHasSavingAccount(false);
             memberRepository.setSavingsAccountClosed(member, savingAccount);
             System.out.println("BanKU: 해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.\n");
             return;
@@ -290,7 +287,6 @@ public class MemberService {
         savingAccount.deactivate();
         savingAccount.setClosed();
         memberRepository.closeAccount(savingAccount);
-        member.setHasSavingAccount(false);
     }
 
     private SavingsType selectDepositProduct(Scanner scanner) {
