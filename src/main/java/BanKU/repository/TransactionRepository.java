@@ -44,7 +44,8 @@ public class TransactionRepository {
                 String[] strings = line.split("\\|");
                 Transaction transaction = Transaction.from(strings);
                 validateDate(regularTransactions, transaction);
-                validateTransaction(regularTransactions, transaction);       // 계좌 잔액에 반영
+                makeInterest(regularTransactions,transaction);
+                validateTransaction(transaction);       // 계좌 잔액에 반영
                 validRegularTransactionLines.add(line);                   // 유효한 행만 저장
                 regularTransactions.add(transaction);
             } catch (IllegalArgumentException e) {
@@ -70,18 +71,12 @@ public class TransactionRepository {
         }
     }
 
-    private void validateTransaction(List<Transaction> regularTransactions, Transaction transaction) throws IllegalArgumentException {
+    private void validateTransaction(Transaction transaction) throws IllegalArgumentException {
         Account senderAccount = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
         Account receiverAccount = memberRepository.findAccountByNumber(transaction.getReceiverAccountNumber());
 
         try {
             transaction.applyToAccounts(senderAccount);               // 거래 내역을 계좌 잔액에 반영
-            if(!regularTransactions.isEmpty()) {
-                long diffMonths = ChronoUnit.MONTHS.between(regularTransactions.get(regularTransactions.size() - 1).getDate(),transaction.getDate());
-                if (diffMonths > 0) {
-                    memberRepository.freeAccountInterest(diffMonths);
-                }
-            }
         } catch (IllegalArgumentException e) {
             senderAccount.deactivate();
             System.out.println(e.getMessage());
@@ -121,7 +116,7 @@ public class TransactionRepository {
                     String[] strings = line.split("\\|");
                     Transaction transaction = Transaction.from(strings);
                     validateDate(savingTransactions, transaction);
-                    validateTransaction(savingTransactions, transaction);
+                    validateTransaction(transaction);
                     validSavingTransactionLines.add(line);
                     savingTransactions.add(transaction);
                 } catch (IllegalArgumentException e) {
@@ -182,5 +177,16 @@ public class TransactionRepository {
                 .filter(transaction -> transaction.getDate().isEqual(date))
                 .mapToLong(Transaction::getAmount)
                 .sum();
+    }
+
+    private void makeInterest(List<Transaction> regularTransactions, Transaction transaction) {
+        Account senderAccount = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
+        if (!regularTransactions.isEmpty()) {
+            long diffMonths = ChronoUnit.MONTHS.between(regularTransactions.get(regularTransactions.size() - 1).getDate(), transaction.getDate());
+            System.out.println(" 거래날짜로 인해 diffMonths=" + diffMonths);
+            if (diffMonths > 0) {
+                memberRepository.freeAccountInterest(diffMonths);
+            }
+        }
     }
 }
