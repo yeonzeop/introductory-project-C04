@@ -168,6 +168,8 @@ public class AccountService {
 
             if (receiverAccount instanceof SavingAccount) {
                 long totalReceivedToday = transactionRepository.getTotalDepositAmount(receiverAccount.getAccountNumber(), now);
+//                System.out.println("[transfer LOG] " + receiverAccount.getAccountNumber() + ", 오늘 받은 금액 = "+ totalReceivedToday);
+
                 if (totalReceivedToday + amount > 1_000_000) {
                     System.out.println("[ERROR] 해당 계좌의 일일 입금 한도(1,000,000원)를 초과할 수 없습니다.");
                     return;
