@@ -89,6 +89,7 @@ public class TransactionRepository {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         String str = getString(transaction, formatter);
         validRegularTransactionLines.add(str);
+        regularTransactions.add(transaction);
         Files.write(path, validRegularTransactionLines);
     }
 
@@ -146,6 +147,7 @@ public class TransactionRepository {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         String str = getString(transaction, formatter);
         validSavingTransactionLines.add(str);
+        savingTransactions.add(transaction);
         Files.write(path, validSavingTransactionLines);
     }
 
@@ -173,7 +175,7 @@ public class TransactionRepository {
 
     public long getTotalDepositAmount(String accountNumber, LocalDate date) {
         return savingTransactions.stream()
-                .filter(transaction -> transaction.getReceiverAccountNumber().equals(accountNumber))
+                .filter(transaction -> transaction.getSenderAccountNumber().equals(accountNumber))
                 .filter(transaction -> transaction.getDate().isEqual(date))
                 .mapToLong(Transaction::getAmount)
                 .sum();
