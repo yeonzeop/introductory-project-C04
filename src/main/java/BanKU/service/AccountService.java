@@ -152,6 +152,7 @@ public class AccountService {
                 continue;
             }
             if (!account.getPassword().equals(password)) {
+                System.out.println("password = " + account.getPassword());
                 System.out.println("[ERROR] 계좌 비밀번호가 틀렸습니다. 비밀번호를 다시 입력해주세요.");
                 continue;
             }

@@ -37,14 +37,10 @@ public class MemberRepository {
 
     private void loadUserFile() throws IOException {
         Path path = Paths.get(USER_FILE_PATH);
-        Files.lines(path)
-                .map(line -> line.split("\\|"))
-                .map(Member::from)
-                .filter(Objects::nonNull)
-                .forEach(member -> {
-                    addMember(member);
-                    addAccount(member.getAccounts());
-                });
+        Files.lines(path).map(line -> line.split("\\|")).map(Member::from).filter(Objects::nonNull).forEach(member -> {
+            addMember(member);
+            addAccount(member.getAccounts());
+        });
     }
 
     private void loadSavingsFile() throws IOException {
@@ -52,25 +48,45 @@ public class MemberRepository {
         validateSavingsFile(path);      // 잘못된 부분이 있으면 수정
 
         // 수정된 파일을 다시 읽어 로드
+
+//        Files.lines(path)
+//                .map(String::trim)
+//                .filter(line -> !line.isEmpty())
+//                .map(line -> line.split("\\|"))
+//                .map(strings -> Map.entry(strings[0], SavingAccount.from(strings)))
+//                .filter(entry -> entry.getValue() != null)
+//                .forEach(entry -> {
+//                    try {
+//                        Member member = findMemberByLoginId(entry.getKey().trim());
+//                        SavingAccount savingAccount = entry.getValue();
+//                        if (savingAccount.isClosed()) {
+//                            savingAccount.deactivate();
+//                        }
+//                        member.addAccount(savingAccount);
+//                        accounts.put(savingAccount.getAccountNumber(), savingAccount);
+//                    } catch (IllegalArgumentException e) {
+//                        System.out.println(e.getMessage());
+//                    }
+//                });
+
         Files.lines(path)
                 .map(String::trim)
                 .filter(line -> !line.isEmpty())
-                .map(line -> line.split("\\|"))
-                .map(strings -> Map.entry(strings[0], SavingAccount.from(strings)))
-                .filter(entry -> entry.getValue() != null)
-                .forEach(entry -> {
-                    try {
-                        Member member = findMemberByLoginId(entry.getKey().trim());
-                        SavingAccount savingAccount = entry.getValue();
-                        if (savingAccount.isClosed()) {
-                            savingAccount.deactivate();
-                        }
-                        member.addAccount(savingAccount);
-                        accounts.put(savingAccount.getAccountNumber(), savingAccount);
-                    } catch (IllegalArgumentException e) {
-                        System.out.println(e.getMessage());
-                    }
-                });
+                .forEach(line -> {
+            String[] tokens = line.split("\\|");
+            try {
+                SavingAccount savingAccount = SavingAccount.from(tokens);
+                if (savingAccount == null) return;
+                Member member = findMemberByLoginId(tokens[0].trim());
+                if (savingAccount.isClosed()) {
+                    savingAccount.deactivate();
+                }
+                member.addAccount(savingAccount);
+                accounts.put(savingAccount.getAccountNumber(), savingAccount);
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        });
     }
 
     private void validateSavingsFile(Path path) throws IOException {
@@ -124,12 +140,7 @@ public class MemberRepository {
 
     public void saveMember(Member member) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
-        String newLine =
-                member.getLoginId().toLowerCase() + "|" +
-                        member.getPassword() + "|" +
-                        member.getName() + "|" +
-                        member.getBirthday().format(formatter) + "|" +
-                        member.getPhoneNumber() + "|";
+        String newLine = member.getLoginId().toLowerCase() + "|" + member.getPassword() + "|" + member.getName() + "|" + member.getBirthday().format(formatter) + "|" + member.getPhoneNumber() + "|";
 
 
         Path path = Paths.get(USER_FILE_PATH);
@@ -191,11 +202,7 @@ public class MemberRepository {
     }
 
     public Member findMemberByLoginId(String loginId) {
-        return membersByLoginId.entrySet().stream()
-                .filter(entry -> entry.getKey().equalsIgnoreCase(loginId))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 등록되지 않은 아이디입니다."));
+        return membersByLoginId.entrySet().stream().filter(entry -> entry.getKey().equalsIgnoreCase(loginId)).map(Map.Entry::getValue).findFirst().orElseThrow(() -> new IllegalArgumentException("[ERROR] 등록되지 않은 아이디입니다."));
     }
 
     public boolean isExistingLoginId(String loginId) {
@@ -216,12 +223,7 @@ public class MemberRepository {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEPOSIT_INFO_FILE_PATH, true))) {
             StringBuilder sb = new StringBuilder();
-            sb.append(member.getLoginId().toLowerCase()).append("|")
-                    .append(savingAccount.getAccountNumber()).append("|")
-                    .append(savingAccount.getPassword()).append("|")
-                    .append(savingAccount.getStartDay().format(formatter)).append("|")
-                    .append(savingAccount.getEndDay().format(formatter)).append("|")
-                    .append(savingAccount.isClosed() ? "closed" : "opened");
+            sb.append(member.getLoginId().toLowerCase()).append("|").append(savingAccount.getAccountNumber()).append("|").append(savingAccount.getPassword()).append("|").append(savingAccount.getStartDay().format(formatter)).append("|").append(savingAccount.getEndDay().format(formatter)).append("|").append(savingAccount.isClosed() ? "closed" : "opened");
             System.out.println("[saveSavingsAccount LOG] 적금계좌 저장 형태 = " + sb.toString());
             writer.write(sb.toString());
             writer.newLine();

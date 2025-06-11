@@ -92,7 +92,6 @@ public class SavingAccount extends Account {
             System.out.println("[ERROR] 유효하지 않은 회원 정보가 데이터입니다. 해당 행을 무시합니다.");
             return null;
         }
-        try {
             validateLoginId(strings[0]);
             Account account = validateAccount(strings[1] + "&" + strings[2]);
             LocalDate startDay = validateDate(strings[3]);
@@ -106,10 +105,7 @@ public class SavingAccount extends Account {
                     startDay,
                     type,
                     isClosed);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+
     }
 
     private static SavingsType determineSavingsType(LocalDate startDay, LocalDate endDay) {
@@ -119,7 +115,11 @@ public class SavingAccount extends Account {
             case 6 -> SavingsType.SHORT;
             case 12 -> SavingsType.MID;
             case 18 -> SavingsType.LONG;
-            default -> throw new IllegalArgumentException("[ERROR] 적금 기간은 6개월, 12개월, 18개월 중 하나여야 합니다.");
+            default -> {
+                System.out.println("[ERROR] 적금 기간은 6개월, 12개월, 18개월 중 하나여야 합니다.");
+                System.exit(0);
+                throw new IllegalStateException("[ERROR] 적금 기간은 6개월, 12개월, 18개월 중 하나여야 합니다.");
+            }
         };
     }
 

@@ -340,7 +340,7 @@ public class MemberService {
             System.out.printf("       수령받을 계좌번호를 입력해주세요(-없이 숫자로만 입력해주세요) > ");
             String rawAccountNumber = scanner.nextLine().trim();
             if (!rawAccountNumber.matches("\\d{12}")) {
-                System.out.println("BanKU: 계좌 번호는 -없이 숫자로만 입력가능합니다. 다시 입력해주세요.\n");
+                System.out.println("BanKU: 계좌 번호는 -없이 숫자로만 입력가능합니다. 다시 입력해주세요.");
                 continue;
             }
             boolean found = false;
