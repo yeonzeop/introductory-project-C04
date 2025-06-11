@@ -90,7 +90,9 @@ public class DateRepository {
         if (!lastDate.isBefore(nowDate)) {
             throw new IllegalArgumentException("[ERROR] " + lastDate.format(formatter) + " 보다 이후의 날짜여야 합니다. 현재 날짜를 다시 입력해주세요.");
         }
-        long diffMonths = ChronoUnit.MONTHS.between(dates.get(dates.size() - 1), nowDate);
+        LocalDate lastStd = LocalDate.of(lastDate.getYear(),lastDate.getMonth(),1);
+        LocalDate currentStd = LocalDate.of(nowDate.getYear(),nowDate.getMonth(),1);
+        long diffMonths = ChronoUnit.MONTHS.between(lastStd,currentStd);
         //확인용 출력
 //        System.out.println("diffMonths=" + diffMonths);
         if( diffMonths > 0){
