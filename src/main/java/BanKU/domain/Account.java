@@ -34,6 +34,9 @@ public class Account {
         if (balance - amount < 0) {
             throw new IllegalArgumentException("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
         }
+        if(this instanceof SavingAccount && !((SavingAccount) this).isClosed()){
+            throw new IllegalArgumentException("[ERROR] 해지하지 않은 적금 계좌는 출금 거래가 불가능 합니다.");
+        }
         balance -= amount;
     }
 
