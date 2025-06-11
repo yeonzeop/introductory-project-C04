@@ -145,10 +145,10 @@ public class TransactionRepository {
         return result;
     }
 
-    public List<Transaction> findTransactionByAccount(SavingAccount savingAccount) {
+    public List<Transaction> findTransactionByAccount(Account account) {
         List<Transaction> result = new ArrayList<>();
-        for (Transaction transaction : savingTransactions) {
-            if (transaction.getSenderAccountNumber().equals(savingAccount.getAccountNumber())) {
+        for (Transaction transaction : regularTransactions) {
+            if (transaction.getSenderAccountNumber().equals(account.getAccountNumber())) {
                 result.add(transaction);
             }
         }
