@@ -21,6 +21,7 @@ public class Account {
         if (balance > Long.MAX_VALUE - amount) {
             throw new IllegalArgumentException("[ERROR] 계좌 잔액 문제가 발생하여 계좌를 비활성화 합니다.");
         }
+//        System.out.println("[plus LOG] "+accountNumber + " 계좌번호에 " + amount + "원 추가");
         balance += amount;
     }
 
