@@ -239,24 +239,30 @@ public class MemberService {
                         account.canAcceptAmount(totalAmount))
                 .toList();
 
-        boolean canReceive = regularAccounts.stream()
-                .anyMatch(account -> account.canAcceptAmount(totalAmount));
+//        boolean canReceive = regularAccounts.stream()
+//                .anyMatch(account -> account.canAcceptAmount(totalAmount));
+//
+//        if (regularAccounts.isEmpty() || !canReceive) {
+//            savingAccount.deactivate();
+//            savingAccount.setClosed();
+//            memberRepository.closeAccount(savingAccount);
+//            member.removeAccount(savingAccount.getAccountNumber());
+//            memberRepository.setSavingsAccountClosed(member, savingAccount);
+//            System.out.println("BanKU: 해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.\n");
+//            return;
+//        }
 
-        if (regularAccounts.isEmpty() || !canReceive) {
+
+        Account receivingAccount = chooseReceivingAccount(scanner, nowDate, savingAccount, regularAccounts);
+        if (!receivingAccount.canAcceptAmount(totalAmount)) {
             savingAccount.deactivate();
             savingAccount.setClosed();
             memberRepository.closeAccount(savingAccount);
             member.removeAccount(savingAccount.getAccountNumber());
             memberRepository.setSavingsAccountClosed(member, savingAccount);
-            System.out.println("BanKU: 해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.\n");
+            System.out.println("해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.");
             return;
         }
-
-
-        Account receivingAccount = chooseReceivingAccount(scanner, nowDate, savingAccount, regularAccounts);
-//        if (!receivingAccount.canAcceptAmount(totalAmount)) {
-//            System.out.println("해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.");
-//        }
 
         while(true) {
             System.out.print("BanKU: 계좌 비밀번호를 입력해주세요(숫자 4자리로 입력해주세요) > ");
@@ -357,14 +363,16 @@ public class MemberService {
                 System.out.println("BanKU: 본인 명의가 아닌 계좌로는 수령할 수 없습니다.");
                 continue;
             }
-            if (regularAccounts.contains(account)) {
-                if (!account.isActive()) {
-                    System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다.");
-                    continue;
+            for (Account regularAccount : regularAccounts) {
+                if (regularAccount.getAccountNumber().equals(account.getAccountNumber())) {
+                    if (!account.isActive()) {
+                        System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다.");
+                        continue;
+                    }
+                    return regularAccount;
                 }
             }
             System.out.println("BanKU: 본인 명의가 아닌 계좌로는 수령할 수 없습니다.");
-
         }
     }
 }
