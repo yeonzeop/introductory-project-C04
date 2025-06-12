@@ -44,6 +44,7 @@ public class TransactionRepository {
                 String[] strings = line.split("\\|");
                 Transaction transaction = Transaction.from(strings);
                 Account sender = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
+                Account receiver = memberRepository.findAccountByNumber(transaction.getReceiverAccountNumber());
                 if ((sender instanceof SavingAccount)) {
                     throw new IllegalArgumentException("[WARNING] 거래 내역 파일은 일반 계좌만을 대상으로 합니다. 조건에 맞지 않는 거래 내역은 자동으로 비활성화됩니다.");
                 }

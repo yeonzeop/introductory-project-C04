@@ -239,28 +239,21 @@ public class MemberService {
                         account.canAcceptAmount(totalAmount))
                 .toList();
 
-//        boolean canReceive = regularAccounts.stream()
-//                .anyMatch(account -> account.canAcceptAmount(totalAmount));
-//
-//        if (regularAccounts.isEmpty() || !canReceive) {
-//            savingAccount.deactivate();
-//            savingAccount.setClosed();
-//            memberRepository.closeAccount(savingAccount);
-//            member.removeAccount(savingAccount.getAccountNumber());
-//            memberRepository.setSavingsAccountClosed(member, savingAccount);
-//            System.out.println("BanKU: 해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.\n");
-//            return;
-//        }
 
-
-        Account receivingAccount = chooseReceivingAccount(scanner, nowDate, savingAccount, regularAccounts);
+        Account receivingAccount;
+        try{
+            receivingAccount = chooseReceivingAccount(scanner, nowDate, savingAccount, regularAccounts);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         if (!receivingAccount.canAcceptAmount(totalAmount)) {
             savingAccount.deactivate();
             savingAccount.setClosed();
             memberRepository.closeAccount(savingAccount);
             member.removeAccount(savingAccount.getAccountNumber());
             memberRepository.setSavingsAccountClosed(member, savingAccount);
-            System.out.println("해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.");
+            System.out.println("BanKU: 해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.");
             return;
         }
 
@@ -363,6 +356,9 @@ public class MemberService {
             } catch (IllegalArgumentException e) {
                 System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다");
                 continue;
+            }
+            if (!account.canAcceptAmount(totalAmount)) {
+                throw new IllegalArgumentException("BanKU: 해당 계좌에서 적금 금액을 모두 수령할 수 없어, 적금 계좌를 동결합니다.");
             }
 
             if (account == null) {

@@ -42,6 +42,10 @@ public class OutputView {
     }
 
     private static String centerAlign(String text, int width) {
+        if (text.length() >= width) {
+            return text; // 너무 길면 그냥 그대로 반환
+        }
+
         int padding = width - text.length();
         int left = padding / 2;
         int right = padding - left;

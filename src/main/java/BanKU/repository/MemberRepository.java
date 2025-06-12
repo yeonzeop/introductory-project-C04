@@ -47,28 +47,6 @@ public class MemberRepository {
         Path path = Paths.get(DEPOSIT_INFO_FILE_PATH);
         validateSavingsFile(path);      // 잘못된 부분이 있으면 수정
 
-        // 수정된 파일을 다시 읽어 로드
-
-//        Files.lines(path)
-//                .map(String::trim)
-//                .filter(line -> !line.isEmpty())
-//                .map(line -> line.split("\\|"))
-//                .map(strings -> Map.entry(strings[0], SavingAccount.from(strings)))
-//                .filter(entry -> entry.getValue() != null)
-//                .forEach(entry -> {
-//                    try {
-//                        Member member = findMemberByLoginId(entry.getKey().trim());
-//                        SavingAccount savingAccount = entry.getValue();
-//                        if (savingAccount.isClosed()) {
-//                            savingAccount.deactivate();
-//                        }
-//                        member.addAccount(savingAccount);
-//                        accounts.put(savingAccount.getAccountNumber(), savingAccount);
-//                    } catch (IllegalArgumentException e) {
-//                        System.out.println(e.getMessage());
-//                    }
-//                });
-
         Files.lines(path)
                 .map(String::trim)
                 .filter(line -> !line.isEmpty())
@@ -195,9 +173,10 @@ public class MemberRepository {
 
     public Account findAccountByNumber(String accountNumber) {
         Account account = accounts.get(accountNumber);
+        System.out.println("[findAccountByNumber LOG] account = "+account);
         if (account == null || (!(account instanceof SavingAccount) && !account.isActive())) {
 //            System.out.println("[findAccountByNumber LOG] 계좌번호 = " + accountNumber + ", 적금계좌인가? " + (account instanceof SavingAccount));
-            throw new IllegalArgumentException("[WARNING] 비활성화 계좌의 계좌번호, 혹은 존재하지 않는 계좌 번호로 인하여 누락된 거래 내역이 있습니다.");
+            throw new IllegalArgumentException("비활성화 계좌");
         }
         return account;
     }
