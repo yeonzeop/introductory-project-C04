@@ -182,6 +182,7 @@ public class MemberRepository {
             }
 
             Files.write(path, lines);
+            accounts.put(account.getAccountNumber(), account);
         } catch (IOException e) {
             System.out.println("[ERROR] 계좌 정보를 파일에 저장하는 데 실패했습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
