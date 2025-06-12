@@ -34,7 +34,7 @@ public class OutputView {
 
             String accountNumber = centerAlign(account.getAccountNumber(), 22);
             String balanceStr = String.format("%,d원", account.getBalance());
-            balanceStr = centerAlign(balanceStr, 24);
+            balanceStr = centerAlign(balanceStr, 40);
 
             System.out.println("       | " + accountNumber + " | " + balanceStr + " |");
             System.out.println("       +------------------------+--------------------------+");
