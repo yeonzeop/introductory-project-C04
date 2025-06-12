@@ -313,5 +313,4 @@ public class MemberRepository {
             System.out.println("[ERROR] 적금 계좌 상태를 'closed'로 변경하는 데 실패했습니다.");
         }
     }
-
 }

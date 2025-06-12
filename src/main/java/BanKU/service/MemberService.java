@@ -264,11 +264,11 @@ public class MemberService {
             return;
         }
 
-        while(true) {
+        while (true) {
             System.out.print("BanKU: 계좌 비밀번호를 입력해주세요(숫자 4자리로 입력해주세요) > ");
             String rawPassword = scanner.nextLine().trim();
             if (rawPassword.matches("\\d{4}")) {
-                if (savingAccount.getPassword().equals(rawPassword)){
+                if (savingAccount.getPassword().equals(rawPassword)) {
                     break;
                 }
                 System.out.println("[ERROR] 올바른 비밀번호가 아닙니다. 다시 한 번 비밀번호를 입력해주세요.");
@@ -357,8 +357,14 @@ public class MemberService {
                 System.out.println("BanKU: 계좌 번호는 -없이 숫자로만 입력가능합니다. 다시 입력해주세요.");
                 continue;
             }
+            Account account;
+            try {
+                account = memberRepository.findAccountByNumber(rawAccountNumber);
+            } catch (IllegalArgumentException e) {
+                System.out.println("BanKU: 비활성화된 계좌에서는 금액을 수령할 수 없습니다");
+                continue;
+            }
 
-            Account account = memberRepository.findAccountByNumber(rawAccountNumber);
             if (account == null) {
                 System.out.println("BanKU: 본인 명의가 아닌 계좌로는 수령할 수 없습니다.");
                 continue;
