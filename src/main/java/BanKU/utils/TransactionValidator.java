@@ -2,7 +2,7 @@ package BanKU.utils;
 
 public class TransactionValidator {
 
-    public final static long AMOUNT_LIMIT = Long.MAX_VALUE;
+    public final static long AMOUNT_LIMIT = 10_000_000L;
 
     public static String validateAccountNumber(String rawAccountNumber) {
         String accountNumber = rawAccountNumber.trim();
