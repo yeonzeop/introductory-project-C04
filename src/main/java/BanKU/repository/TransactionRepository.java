@@ -47,7 +47,7 @@ public class TransactionRepository {
                 Account sender = memberRepository.findAccountByNumber(transaction.getSenderAccountNumber());
                 Account receiver = memberRepository.findAccountByNumber(transaction.getReceiverAccountNumber());
                 if ((sender instanceof SavingAccount)) {
-                    throw new IllegalArgumentException("[WARNING] 거래 내역 파일은 일반 계좌만을 대상으로 합니다. 조건에 맞지 않는 거래 내역은 자동으로 비활성화됩니다.");
+                    throw new IllegalArgumentException("[WARNING] 거래 내역 파일은 일반 계좌만을 대상으로 합니다. 조건에 맞지 않는 거래 내역은 무시됩니다.");
                 }
 
                 if ((receiver instanceof SavingAccount) && !((SavingAccount)receiver).isClosed()) {
@@ -132,7 +132,7 @@ public class TransactionRepository {
                     Transaction transaction = Transaction.from(strings);
                     Account savingAccount = memberRepository.findAccountByNumber((transaction.getSenderAccountNumber()));
                     if (! (savingAccount instanceof SavingAccount)) {
-                        throw new IllegalArgumentException("[WARNING] 적금 거래내역 파일의 입금은 적금 계좌에 한해 허용됩니다. 해당 조건을 만족하지 않는 거래 내역은 자동으로 비활성화됩니다.");
+                        throw new IllegalArgumentException("[WARNING] 적금 거래내역 파일의 입금은 적금 계좌에 한해 허용됩니다. 해당 조건을 만족하지 않는 거래 내역은 무시됩니다.");
                     }
                     if(transaction.getType()== TransactionType.WITHDRAWAL && !((SavingAccount) savingAccount).isClosed()){
                         throw new IllegalArgumentException("[ERROR] 해지하지 않은 적금 계좌는 출금 거래가 불가능 합니다.");
