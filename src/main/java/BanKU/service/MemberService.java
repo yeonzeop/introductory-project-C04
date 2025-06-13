@@ -18,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Scanner;
 
+import static BanKU.enums.SavingsType.*;
 import static BanKU.enums.TransactionType.DEPOSIT;
 
 public class MemberService {
@@ -147,8 +148,12 @@ public class MemberService {
             System.out.println("이미 적금 계좌가 존재합니다. 한 개의 적금 계좌만 만들 수 있습니다.");
             return;
         }
-
-        SavingsType type = selectDepositProduct(scanner);
+        SavingsType type;
+        try {
+            type = selectDepositProduct(scanner);
+        } catch (IllegalArgumentException e) {
+            return;
+        }
         String accountNumber = generateUniqueAccountNumber(nowDate);
         String password = generatePassword(scanner);
         SavingAccount savingAccount = new SavingAccount(accountNumber, password, nowDate, type, false);
@@ -241,7 +246,7 @@ public class MemberService {
 
 
         Account receivingAccount;
-        try{
+        try {
             receivingAccount = chooseReceivingAccount(scanner, nowDate, savingAccount, regularAccounts);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
@@ -315,13 +320,46 @@ public class MemberService {
             String input = scanner.nextLine().trim();
             switch (input) {
                 case "1":
-                    return SavingsType.SHORT;
+                    if (!confirmCreate(SHORT, scanner)) {
+                        throw new IllegalArgumentException("적금취소");
+                    }
+                    return SHORT;
                 case "2":
-                    return SavingsType.MID;
+                    if (!confirmCreate(MID, scanner)) {
+                        throw new IllegalArgumentException("적금취소");
+                    }
+                    return MID;
                 case "3":
-                    return SavingsType.LONG;
+                    if (!confirmCreate(LONG, scanner)) {
+                        throw new IllegalArgumentException("적금취소");
+                    }
+                    return LONG;
                 default:
                     System.out.println("[ERROR] 잘못된 입력입니다. 1~3 사이의 숫자를 입력해주세요. > ");
+            }
+        }
+    }
+
+    private boolean confirmCreate(SavingsType type, Scanner scanner) {
+        System.out.println("BanKU: --------------------------------------------------------------------------");
+        System.out.println("                                    적금           가입                             ");
+        System.out.println("       ---------------------------------------------------------------------------");
+        System.out.printf("       가입 상품 : 자유 적금 - %d개월%n", type.getMonth());
+        System.out.printf("       만기 시 적용 금리: %.1f%%%30s중도 해지 시 적용 금리: %.1f%%%n",
+                type.getRate() * 100,
+                "",
+                type.getEarlyRate() * 100
+        );
+        System.out.println("       ---------------------------------------------------------------------------");
+        while (true) {
+            System.out.print("BanKU: 해당 상품을 가입하시겠습니까? (y/n)> ");
+            String input = scanner.nextLine().trim();
+            if (input.equalsIgnoreCase("y")) {
+                return true;
+            } else if (input.equalsIgnoreCase("n")) {
+                return false;
+            } else {
+                System.out.println("[ERROR] 잘못된 입력입니다. 'y' 또는 'n'만 입력해주세요.");
             }
         }
     }
