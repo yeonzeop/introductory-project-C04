@@ -128,11 +128,11 @@ public class AccountService {
             try {
                 amount = Long.parseLong(rawAmount);
             } catch (NumberFormatException e) {
-                System.out.println("[ERROR] 거래 한도 10,000,000 원(일천만 원)보다 더 큰 금액은 거래가 불가능합니다.");
+                System.out.println("[ERROR] 일일 거래 한도 10,000,000 원(일천만 원)보다 더 큰 금액은 거래가 불가능합니다.");
                 continue;
             }
             if (amount > AMOUNT_LIMIT) {
-                System.out.println("[ERROR] 거래 한도 10,000,000 원(일천만 원)보다 더 큰 금액은 거래가 불가능합니다.");
+                System.out.println("[ERROR] 일일 거래 한도 10,000,000 원(일천만 원)보다 더 큰 금액은 거래가 불가능합니다.");
                 continue;
             }
             if (amount <= 0) {
@@ -148,12 +148,12 @@ public class AccountService {
             System.out.print("BanKU: 계좌 비밀번호를 입력해주세요(숫자 4자리로 입력해주세요) > ");
             String password = scanner.nextLine().trim();
             if (!password.matches("\\d{4}")) {
-                System.out.println("[ERROR] 계좌 비밀번호는 숫자로만 입력 가능합니다. 비밀번호를 다시 입력해주세요.");
+                System.out.println("[ERROR] 계좌 비밀번호는 숫자로만 입력 가능합니다. 다시 한번 비밀번호를 입력해주세요.");
                 continue;
             }
             if (!account.getPassword().equals(password)) {
                 System.out.println("password = " + account.getPassword());
-                System.out.println("[ERROR] 계좌 비밀번호가 틀렸습니다. 비밀번호를 다시 입력해주세요.");
+                System.out.println("[ERROR] 올바른 비밀번호가 아닙니다. 다시 한번 비밀번호를 입력해주세요.");
                 continue;
             }
             break;
