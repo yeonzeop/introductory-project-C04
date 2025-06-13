@@ -204,11 +204,11 @@ public class MemberRepository {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DEPOSIT_INFO_FILE_PATH, true))) {
             StringBuilder sb = new StringBuilder();
             sb.append(member.getLoginId().toLowerCase()).append("|").append(savingAccount.getAccountNumber()).append("|").append(savingAccount.getPassword()).append("|").append(savingAccount.getStartDay().format(formatter)).append("|").append(savingAccount.getEndDay().format(formatter)).append("|").append(savingAccount.isClosed() ? "closed" : "opened");
-            System.out.println("[saveSavingsAccount LOG] 적금계좌 저장 형태 = " + sb.toString());
+//            System.out.println("[saveSavingsAccount LOG] 적금계좌 저장 형태 = " + sb.toString());
             writer.write(sb.toString());
             writer.newLine();
             accounts.put(savingAccount.getAccountNumber(), savingAccount);
-            System.out.println("[saveSavingsAccount LOG] 새로 생성한 계좌 = " + savingAccount.toString());
+//            System.out.println("[saveSavingsAccount LOG] 새로 생성한 계좌 = " + savingAccount.toString());
         } catch (IOException e) {
             System.out.println("[ERROR] 적금 계좌 정보를 파일에 저장하는 데 실패했습니다.");
             System.out.println("[ERROR MESSAGE] " + e.getMessage());
