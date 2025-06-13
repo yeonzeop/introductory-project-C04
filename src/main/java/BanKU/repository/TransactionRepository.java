@@ -3,6 +3,7 @@ package BanKU.repository;
 import BanKU.domain.Account;
 import BanKU.domain.SavingAccount;
 import BanKU.domain.Transaction;
+import BanKU.enums.TransactionType;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -132,6 +133,9 @@ public class TransactionRepository {
                     Account savingAccount = memberRepository.findAccountByNumber((transaction.getSenderAccountNumber()));
                     if (! (savingAccount instanceof SavingAccount)) {
                         throw new IllegalArgumentException("[WARNING] 적금 거래내역 파일의 입금은 적금 계좌에 한해 허용됩니다. 해당 조건을 만족하지 않는 거래 내역은 자동으로 비활성화됩니다.");
+                    }
+                    if(transaction.getType()== TransactionType.WITHDRAWAL && !((SavingAccount) savingAccount).isClosed()){
+                        throw new IllegalArgumentException("[ERROR] 해지하지 않은 적금 계좌는 출금 거래가 불가능 합니다.");
                     }
                     validateDate(savingTransactions, transaction);
                     validateTransaction(transaction);
