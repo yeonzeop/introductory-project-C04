@@ -406,6 +406,7 @@ public class MemberService {
 
             if(account instanceof SavingAccount){
                 System.out.println("BanKU: 적금 계좌로는 수령할 수 없습니다.");
+                continue;
             }
             for (Account regularAccount : regularAccounts) {
                 if (regularAccount.getAccountNumber().equals(account.getAccountNumber())) {
