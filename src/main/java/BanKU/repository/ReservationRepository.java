@@ -81,7 +81,7 @@ public class ReservationRepository {
                     validLines.add(str);
                 }
             } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
+                System.out.println("[WARNING] 비활성화 계좌의 계좌번호, 혹은 존재하지 않는 계좌 번호로 인하여 누락된 거래 내역이 있습니다.");
             }
         }
         Files.write(path,validLines);
