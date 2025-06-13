@@ -69,6 +69,8 @@ public class ReservationRepository {
                     if(sendAccount.isActive() && receiverAccount.isActive()){
                         validateTransaction(reservedWithdrawal);
                         validateTransaction(reservedDeposit);
+                    }else{
+                        throw new IllegalArgumentException();
                     }
                     if(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()) instanceof SavingAccount){
                         transactionRepository.saveDeposit(reservedDeposit);
