@@ -64,8 +64,12 @@ public class ReservationRepository {
                             reservation.getTransferDate(),
                             TransactionType.WITHDRAWAL, reservation.getReceiverAccountNumber(),
                             reservation.getAmount(), reservation.getMemo());
-                    validateTransaction(reservedWithdrawal);
-                    validateTransaction(reservedDeposit);
+                    Account sendAccount = memberRepository.findAccountByNumber(reservedWithdrawal.getSenderAccountNumber());
+                    Account receiverAccount = memberRepository.findAccountByNumber(reservedWithdrawal.getReceiverAccountNumber());
+                    if(sendAccount.isActive() && receiverAccount.isActive()){
+                        validateTransaction(reservedWithdrawal);
+                        validateTransaction(reservedDeposit);
+                    }
                     if(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()) instanceof SavingAccount){
                         transactionRepository.saveDeposit(reservedDeposit);
                     }else{
