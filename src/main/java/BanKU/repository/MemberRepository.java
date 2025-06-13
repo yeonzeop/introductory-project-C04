@@ -174,7 +174,7 @@ public class MemberRepository {
     public Account findAccountByNumber(String accountNumber) {
         Account account = accounts.get(accountNumber);
 //        System.out.println("[findAccountByNumber LOG] account = "+account);
-        if (account == null ||  !account.isActive()) {
+        if (account == null ||!(account instanceof SavingAccount) && !account.isActive()) {
 //            System.out.println("[findAccountByNumber LOG] 계좌번호 = " + accountNumber + ", 적금계좌인가? " + (account instanceof SavingAccount));
             throw new IllegalArgumentException("비활성화 계좌");
         }
