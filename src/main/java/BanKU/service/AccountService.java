@@ -255,6 +255,10 @@ public class AccountService {
             }
             try {
 //                System.out.println("[getReceiverAccount] accountNumber = " + accountNumber);
+                Account account  = memberRepository.findAccountByNumber(accountNumber);
+                if(account instanceof SavingAccount && ((SavingAccount) account).isClosed()){
+                    throw  new IllegalArgumentException();
+                }
                 return memberRepository.findAccountByNumber(accountNumber);
             } catch (IllegalArgumentException e) {
                 System.out.println("[ERROR] 존재하지 않거나 비활성화된 계좌번호입니다. 다시 입력해주세요.");
