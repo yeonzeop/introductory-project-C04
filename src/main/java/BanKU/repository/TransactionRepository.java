@@ -48,6 +48,10 @@ public class TransactionRepository {
                 if ((sender instanceof SavingAccount)) {
                     throw new IllegalArgumentException("[WARNING] 거래 내역 파일은 일반 계좌만을 대상으로 합니다. 조건에 맞지 않는 거래 내역은 자동으로 비활성화됩니다.");
                 }
+
+                if ((receiver instanceof SavingAccount) && !((SavingAccount)receiver).isClosed()) {
+                    throw new IllegalArgumentException("[WARNING] 해지하지 않은 적금 계좌에서는 출금을 할 수 없습니다.");
+                }
                 validateDate(regularTransactions, transaction);
                 makeInterest(regularTransactions,transaction);
                 validateTransaction(transaction);       // 계좌 잔액에 반영
