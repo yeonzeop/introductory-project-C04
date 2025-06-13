@@ -201,8 +201,8 @@ public class AccountService {
                     receiverAccount.getAccountNumber(),
                     amount,
                     memo);
-            boolean applyReceive = applyTransactionToAccount(receiverAccount, receiveTransaction);
             boolean applySend = applyTransactionToAccount(senderAccount, sendTransaction);
+            boolean applyReceive = applyTransactionToAccount(receiverAccount, receiveTransaction);
             if (!(applyReceive && applySend)) {
                 return;
             }
