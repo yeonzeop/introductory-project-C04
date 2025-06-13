@@ -403,6 +403,10 @@ public class MemberService {
                 System.out.println("BanKU: 본인 명의가 아닌 계좌로는 수령할 수 없습니다.");
                 continue;
             }
+
+            if(account instanceof SavingAccount){
+                System.out.println("BanKU: 적금 계좌로는 수령할 수 없습니다.");
+            }
             for (Account regularAccount : regularAccounts) {
                 if (regularAccount.getAccountNumber().equals(account.getAccountNumber())) {
                     if (!account.isActive()) {
