@@ -70,7 +70,7 @@ public class ReservationRepository {
                         validateTransaction(reservedWithdrawal);
                         validateTransaction(reservedDeposit);
                     }else{
-                        throw new IllegalArgumentException();
+                        throw new IllegalArgumentException("[WARNING] 비활성화 계좌의 계좌번호, 혹은 존재하지 않는 계좌 번호로 인하여 누락된 거래 내역이 있습니다.");
                     }
                     if(memberRepository.findAccountByNumber(reservation.getReceiverAccountNumber()) instanceof SavingAccount){
                         transactionRepository.saveDeposit(reservedDeposit);
@@ -83,7 +83,7 @@ public class ReservationRepository {
                     validLines.add(str);
                 }
             } catch (IllegalArgumentException e) {
-                System.out.println("[WARNING] 비활성화 계좌의 계좌번호, 혹은 존재하지 않는 계좌 번호로 인하여 누락된 거래 내역이 있습니다.");
+                System.out.println(e.getMessage());
             }
         }
         Files.write(path,validLines);
