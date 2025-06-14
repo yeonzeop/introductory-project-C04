@@ -373,7 +373,14 @@ public class MemberService {
         List<Transaction> transactions = transactionRepository.findSavingTransactionByAccount(savingAccount);
         long interest = savingAccount.computeInterest(nowDate, transactions);
         long totalDeposited = savingAccount.computeTotalDeposited(transactions);
-        long totalAmount = interest + totalDeposited;
+
+        long totalAmountTemp= interest + totalDeposited;
+        if(nowDate.isAfter(savingAccount.getEndDay())){
+            long diffMonths = ChronoUnit.MONTHS.between(savingAccount.getEndDay(),nowDate);
+            totalAmountTemp += (long) Math.ceil(totalAmountTemp * (diffMonths * ((0.1/ 100) / 12)));
+        }
+        long totalAmount= totalAmountTemp;
+        long totalInterst = totalAmount - totalDeposited;
 
         System.out.println("BanKU: --------------------------------------------------------------------------");
         System.out.println("                          실수령액    확인    및    수령   계좌   입력                  ");
@@ -382,7 +389,7 @@ public class MemberService {
         System.out.printf("       적용 금리: %.1f%%%30s이자(단위: 원):     %,d원%n",
                 savingAccount.getRate(nowDate) * 100,
                 "",
-                interest);
+                totalInterst);
         System.out.printf("       실수령액: %,d원%n", totalAmount);
 
         while (true) {
