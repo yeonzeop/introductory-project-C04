@@ -237,8 +237,12 @@ public class MemberService {
 
         long interest = savingAccount.computeInterest(nowDate, transactions);
         long totalDeposited = savingAccount.computeTotalDeposited(transactions);
-        long totalAmount = interest + totalDeposited;
-
+        long totalAmountTemp= interest + totalDeposited;
+        if(nowDate.isAfter(savingAccount.getEndDay())){
+            long diffMonths = ChronoUnit.MONTHS.between(savingAccount.getEndDay(),nowDate);
+            totalAmountTemp += (long) Math.ceil(totalAmountTemp * (diffMonths * ((0.1/ 100) / 12)));
+        }
+        long totalAmount= totalAmountTemp;
         List<Account> regularAccounts = member.getAccounts().stream()
                 .filter(account -> !(account instanceof SavingAccount) &&
                         account.canAcceptAmount(totalAmount))

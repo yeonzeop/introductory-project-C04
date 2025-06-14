@@ -60,7 +60,7 @@ public class SavingAccount extends Account {
         for (Transaction transaction : transactions) {
             if (transaction.getType() != DEPOSIT) continue; // 입금만 계산 대상
 
-            long operatingDays = ChronoUnit.DAYS.between(transaction.getDate(), isClosed ? endDay : nowDate);
+            long operatingDays = ChronoUnit.DAYS.between(transaction.getDate(), (isClosed|| nowDate.isAfter(endDay)) ? endDay : nowDate);
             if (operatingDays < 0) continue; // 잘못된 날짜는 무시
 
             double rateToApply = getRate(nowDate); // 조기해지 여부에 따라 적용 이율 결정
