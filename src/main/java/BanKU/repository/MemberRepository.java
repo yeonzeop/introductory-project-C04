@@ -256,6 +256,9 @@ public class MemberRepository {
     public void freeAccountInterestForDate(LocalDate now, TransactionRepository tr) {
         double interestRate = 0.1;
         List<Transaction> trs = tr.getRegularTransactions();
+        if(trs.isEmpty()){
+            return;
+        }
         LocalDate last = trs.get(trs.size() - 1).getDate();
         LocalDate lastStd = LocalDate.of(last.getYear(), last.getMonth(), 1);
         LocalDate nowStd = LocalDate.of(now.getYear(), now.getMonth(), 1);
